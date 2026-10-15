@@ -24,12 +24,26 @@ SARVAM_STT_MODEL = os.getenv("SARVAM_STT_MODEL", "saaras:v3")
 SARVAM_TTS_MODEL = os.getenv("SARVAM_TTS_MODEL", "bulbul:v3")
 CLAUDE_FAST_MODEL = os.getenv("CLAUDE_FAST_MODEL", "claude-haiku-5-5")
 CLAUDE_MAIN_MODEL = os.getenv("CLAUDE_MAIN_MODEL", "claude-sonnet-5-5")
+# Groq Cloud (OpenAI-compatible API) runs every LLM step: extraction, explanation, guardrail check and the companion chat.
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1").rstrip("/")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 # MOCK_MODE=true forces every mock. Otherwise each service is real only when its key is present,
 # so the app always runs end-to-end.
 MOCK_MODE = _bool("MOCK_MODE", True)
 MOCK_SPEECH = MOCK_MODE or not SARVAM_API_KEY
-MOCK_LLM = MOCK_MODE or not ANTHROPIC_API_KEY
+MOCK_LLM = MOCK_MODE or not GROQ_API_KEY
+
+# Supabase Postgres holds accounts, cycle data and companion history. Empty = local SQLite (tests/offline dev) and
+# in-process chat memory.
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+DB_POOL_MAX = int(os.getenv("DB_POOL_MAX", "10"))
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").strip()
+HISTORY_TTL_DAYS = int(os.getenv("HISTORY_TTL_DAYS", "90"))
+HISTORY_RECENT_TURNS = 12  # messages sent verbatim to the model each turn
+HISTORY_MAX_MESSAGES = 400  # per user, oldest trimmed
+NOTES_EVERY_MESSAGES = 10  # refresh the long-term notes summary this often
 
 FFMPEG_PATH = os.getenv("FFMPEG_PATH", "").strip() or shutil.which("ffmpeg") or ""
 if FFMPEG_PATH and not Path(FFMPEG_PATH).is_file():
@@ -48,6 +62,7 @@ ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://local
 
 SARVAM_TIMEOUT_S = 15
 CLAUDE_TIMEOUT_S = 25
+GROQ_TIMEOUT_S = 30
 TTS_MAX_CHARS = 2500
 
 KB_DIR = BASE_DIR / "kb"
@@ -64,4 +79,8 @@ LANG_BY_CODE = {l["code"]: l for l in LANGUAGES["languages"]}
 
 
 def lang_name(code: str) -> str:
+    """'hi-IN-Latn' (Hindi typed in English letters) reads as 'Hinglish'."""
+    if code.endswith("-Latn"):
+        base = LANG_BY_CODE.get(code[:-5], {}).get("english_name", "English")
+        return "Hinglish" if code == "hi-IN-Latn" else f"{base} (in English letters)"
     return LANG_BY_CODE.get(code, {}).get("english_name", "English")

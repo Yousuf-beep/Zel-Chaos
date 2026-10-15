@@ -1,32 +1,16 @@
+import asyncio
 import hashlib
 import hmac
 import re
 import secrets
-import sqlite3
-import threading
-import time
 from dataclasses import dataclass
-from pathlib import Path
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import config
+from services.db import Database, db as default_db
 
-# Accounts hold only a display name, a login handle and a password hash. Conversations are never stored here.
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS users (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  handle TEXT NOT NULL UNIQUE,
-  pw_hash BLOB NOT NULL,
-  salt BLOB NOT NULL,
-  created_at REAL NOT NULL
-);
-CREATE TABLE IF NOT EXISTS tokens (
-  token_hash TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  expires_at REAL NOT NULL
-);
-"""
+# Accounts hold only a display name, a login handle and a password hash (sakhi.users). Health data lives elsewhere.
 
 _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -67,16 +51,11 @@ def _token_hash(token: str) -> str:
 
 
 class AuthStore:
-    def __init__(self, path: Path | str = config.AUTH_DB_PATH, ttl_days: int = config.AUTH_TTL_DAYS):
-        self.ttl = ttl_days * 86400
-        if str(path) != ":memory:":
-            Path(path).parent.mkdir(parents=True, exist_ok=True)
-        self._db = sqlite3.connect(str(path), check_same_thread=False)
-        self._db.execute("PRAGMA foreign_keys = ON")
-        self._db.executescript(_SCHEMA)
-        self._lock = threading.Lock()
+    def __init__(self, database: Database | None = None, ttl_days: int = config.AUTH_TTL_DAYS):
+        self.db = database or default_db
+        self.ttl = timedelta(days=ttl_days)
 
-    def signup(self, name: str, handle: str, password: str) -> tuple[User, str]:
+    async def signup(self, name: str, handle: str, password: str) -> tuple[User, str]:
         name = name.strip()
         if not name or len(name) > 60:
             raise AuthError(422, "Tell us what to call you.")
@@ -85,53 +64,44 @@ class AuthStore:
         handle = normalise_handle(handle)
         salt = secrets.token_bytes(16)
         user = User(id=secrets.token_hex(12), name=name, handle=handle)
-        with self._lock:
-            try:
-                self._db.execute(
-                    "INSERT INTO users (id, name, handle, pw_hash, salt, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                    (user.id, name, handle, _hash(password, salt), salt, time.time()),
-                )
-                self._db.commit()
-            except sqlite3.IntegrityError:
-                raise AuthError(409, "An account with this email or phone already exists. Log in instead.")
-        return user, self._issue(user.id)
+        inserted = await self.db.execute(
+            "INSERT INTO sakhi.users (id, name, handle, pw_hash, salt) VALUES (%s, %s, %s, %s, %s) ON CONFLICT (handle) DO NOTHING",
+            user.id, name, handle, await asyncio.to_thread(_hash, password, salt), salt)
+        if not inserted:
+            raise AuthError(409, "An account with this email or phone already exists. Log in instead.")
+        return user, await self._issue(user.id)
 
-    def login(self, handle: str, password: str) -> tuple[User, str]:
+    async def login(self, handle: str, password: str) -> tuple[User, str]:
         try:
             handle = normalise_handle(handle)
         except AuthError:
             raise AuthError(401, "That email/phone and password don't match.")
-        with self._lock:
-            row = self._db.execute("SELECT id, name, handle, pw_hash, salt FROM users WHERE handle = ?", (handle,)).fetchone()
-        if not row or not hmac.compare_digest(row[3], _hash(password, row[4])):
+        row = await self.db.fetchone("SELECT id, name, handle, pw_hash, salt FROM sakhi.users WHERE handle = %s", handle)
+        # scrypt is deliberately slow; run it off the event loop.
+        if not row or not hmac.compare_digest(bytes(row[3]), await asyncio.to_thread(_hash, password, bytes(row[4]))):
             raise AuthError(401, "That email/phone and password don't match.")
-        return User(row[0], row[1], row[2]), self._issue(row[0])
+        return User(row[0], row[1], row[2]), await self._issue(row[0])
 
-    def _issue(self, user_id: str) -> str:
+    async def _issue(self, user_id: str) -> str:
         token = secrets.token_urlsafe(32)
-        with self._lock:
-            self._db.execute("DELETE FROM tokens WHERE expires_at < ?", (time.time(),))
-            self._db.execute("INSERT INTO tokens (token_hash, user_id, expires_at) VALUES (?, ?, ?)",
-                             (_token_hash(token), user_id, time.time() + self.ttl))
-            self._db.commit()
+        now = datetime.now(timezone.utc)
+        await self.db.execute("DELETE FROM sakhi.auth_tokens WHERE expires_at < %s", now)
+        await self.db.execute("INSERT INTO sakhi.auth_tokens (token_hash, user_id, expires_at) VALUES (%s, %s, %s)",
+                              _token_hash(token), user_id, now + self.ttl)
         return token
 
-    def user_for(self, token: Optional[str]) -> Optional[User]:
+    async def user_for(self, token: Optional[str]) -> Optional[User]:
         if not token:
             return None
-        with self._lock:
-            row = self._db.execute(
-                "SELECT u.id, u.name, u.handle FROM tokens t JOIN users u ON u.id = t.user_id WHERE t.token_hash = ? AND t.expires_at > ?",
-                (_token_hash(token), time.time()),
-            ).fetchone()
+        row = await self.db.fetchone(
+            "SELECT u.id, u.name, u.handle FROM sakhi.auth_tokens t JOIN sakhi.users u ON u.id = t.user_id "
+            "WHERE t.token_hash = %s AND t.expires_at > %s",
+            _token_hash(token), datetime.now(timezone.utc))
         return User(*row) if row else None
 
-    def logout(self, token: Optional[str]) -> None:
-        if not token:
-            return
-        with self._lock:
-            self._db.execute("DELETE FROM tokens WHERE token_hash = ?", (_token_hash(token),))
-            self._db.commit()
+    async def logout(self, token: Optional[str]) -> None:
+        if token:
+            await self.db.execute("DELETE FROM sakhi.auth_tokens WHERE token_hash = %s", _token_hash(token))
 
 
 auth = AuthStore()
