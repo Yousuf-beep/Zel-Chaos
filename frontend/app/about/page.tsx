@@ -83,7 +83,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="section" style={{ paddingTop: 20 }} aria-label="Sakhi promise">
+      <section className="section" style={{ paddingTop: 20 }} aria-label="Nola promise">
         <p className="statement tight">
           {statement.map((w, i) => (
             <span key={i} className="w" style={{ "--p": i / statement.length } as React.CSSProperties}>{w} </span>
@@ -112,7 +112,7 @@ export default function About() {
 
       <footer className="foot-note">
         <span>{t("welcome.private")}</span>
-        <span>© Sakhi · CHAOS 2026</span>
+        <span>© Nola · CHAOS 2026</span>
       </footer>
     </>
   );

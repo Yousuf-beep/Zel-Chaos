@@ -5,12 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import { DEMO_LANGS, FALLBACK_LANGS } from "@/lib/i18n";
+import { playSfx } from "@/lib/sound";
+import Mascot, { MASCOTS } from "./Mascot";
 import QuickExit from "./QuickExit";
+import SoundToggle from "./SoundToggle";
 
 const LINKS = [
   { href: "/home", key: "side.home", auth: true },
-  { href: "/call", key: "side.call", auth: true },
   { href: "/chat", key: "side.chat", auth: true },
+  { href: "/chat?voice=1", key: "side.call", auth: true },
+  { href: "/cycle", key: "side.cycle", auth: true },
+  { href: "/call", key: "side.check", auth: true },
   { href: "/learn", key: "side.learn" },
   { href: "/doctor-card", key: "side.card" },
   { href: "/about", key: "side.about" },
@@ -18,7 +23,7 @@ const LINKS = [
 ];
 
 export default function Header() {
-  const { t, lang, setLang, user, logout } = useStore();
+  const { t, lang, setLang, user, logout, mascot, setMascot } = useStore();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -42,8 +47,8 @@ export default function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // The start screen is its own full-bleed brand moment.
-  if (pathname === "/") return null;
+  // The start screen is its own full-bleed brand moment; the chat has its own top bar and drawer.
+  if (pathname === "/" || pathname === "/chat") return null;
 
   const close = () => {
     setOpen(false);
@@ -58,11 +63,12 @@ export default function Header() {
           <button ref={menuBtn} className="burger" aria-expanded={open} aria-controls="side-panel" aria-label={t("side.open")} onClick={() => setOpen(true)}>
             <i /><i /><i />
           </button>
-          <Link className="logo" href={user ? "/home" : "/"} aria-label="Sakhi home">
-            Sakhi<i aria-hidden="true" />
+          <Link className="logo" href={user ? "/home" : "/"} aria-label="Nola home">
+            Nola<i aria-hidden="true" />
           </Link>
         </div>
         <nav className="header-actions" aria-label="Main">
+          <SoundToggle />
           <QuickExit />
         </nav>
       </header>
@@ -84,6 +90,30 @@ export default function Header() {
           ))}
         </nav>
         <div className="side-bottom">
+          {user?.onboarded && (
+            <div className="side-mascots" role="radiogroup" aria-label={t("mascot.change")}>
+              <span className="c-label">{t("mascot.change")}</span>
+              <div>
+                {MASCOTS.map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="radio"
+                    data-sfx="pop"
+                    aria-checked={mascot === k}
+                    aria-label={t(`mascot.k.${k}`)}
+                    title={t(`mascot.k.${k}`)}
+                    onClick={() => {
+                      playSfx("pop");
+                      setMascot(k);
+                    }}
+                  >
+                    <Mascot size="xs" kind={k} decorative />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="side-langs" role="group" aria-label={t("nav.language")}>
             {FALLBACK_LANGS.filter((l) => DEMO_LANGS.includes(l.code)).map((l) => (
               <button key={l.code} aria-pressed={lang === l.code} onClick={() => setLang(l.code)} lang={l.code}>

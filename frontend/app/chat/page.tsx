@@ -1,12 +1,12 @@
 "use client";
 
-import CompanionChat from "@/components/CompanionChat";
+import ChatApp from "@/components/chat/ChatApp";
 import { useRequireUser } from "@/lib/store";
 
-// Typing-first door is the Sakhi companion: listens, reassures and suggests, with cycle tracking and per-user memory.
-// The voice door (/call) keeps the structured symptom flow.
+// Chat with Nola: listens, reassures and suggests, with saved chats, voice mode and doctor-visit
+// reports. The structured symptom check stays at /call.
 export default function Chat() {
   const user = useRequireUser();
   if (!user) return null;
-  return <CompanionChat />;
+  return <ChatApp />;
 }

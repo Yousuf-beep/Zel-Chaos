@@ -26,7 +26,7 @@ export default function Urgent() {
   return createPortal(
     <div className="urgent-screen" data-tier={urgent.tier} role="alertdialog" aria-labelledby="urgent-title" aria-describedby="urgent-msg">
       <div className="urgent-top">
-        <span className="kicker" style={{ color: "inherit", opacity: 0.85 }}><span className="pulse" aria-hidden="true" />Sakhi</span>
+        <span className="kicker" style={{ color: "inherit", opacity: 0.85 }}><span className="pulse" aria-hidden="true" />Nola</span>
         <QuickExit />
       </div>
       <h1 id="urgent-title" className="tight">{crisis ? t("urgent.crisisTitle") : t("urgent.emergencyTitle")}</h1>

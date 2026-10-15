@@ -29,10 +29,10 @@ export default function Start() {
     introPlayed = true;
   }, []);
 
-  // The saved login finished loading while the form was open: skip ahead. (After a submit the form runs its own transition.)
+  // Already signed in on this device: go straight in. (After a submit the form runs its own transition.)
   useEffect(() => {
-    if (phase === "auth" && user && !submitted.current) router.replace("/home");
-  }, [phase, user, router]);
+    if (user && !submitted.current) router.replace(user.onboarded ? "/home" : "/welcome");
+  }, [user, router]);
 
   // FLIP: the logo is the same element in both phases, so it glides from its splash size and spot to its form size and spot.
   useLayoutEffect(() => {
@@ -54,7 +54,7 @@ export default function Start() {
   };
 
   const start = (e: React.MouseEvent) => {
-    if (user) return circleNav(router, "/home", e);
+    if (user) return circleNav(router, user.onboarded ? "/home" : "/welcome", e);
     setPhase("leaving");
     setTimeout(() => go("auth"), reducedMotion() ? 0 : 430);
   };
@@ -64,9 +64,9 @@ export default function Start() {
       <span className="start-orb" aria-hidden="true" />
       <span className="start-orb two" aria-hidden="true" />
       <div className="start-inner">
-        <h1 ref={logo} className="start-logo" aria-label="Sakhi">
+        <h1 ref={logo} className="start-logo" aria-label="Nola">
           <span className="start-letters" aria-hidden="true">
-            {"Sakhi".split("").map((c, i) => <span key={i} style={{ "--i": i } as React.CSSProperties}>{c}</span>)}
+            {"Nola".split("").map((c, i) => <span key={i} style={{ "--i": i } as React.CSSProperties}>{c}</span>)}
           </span>
           <i aria-hidden="true" />
         </h1>
@@ -100,7 +100,7 @@ function AuthPanel({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => v
   const [error, setError] = useState("");
   const submitRef = useRef<HTMLButtonElement>(null);
   const isSignup = mode === "signup";
-  const ready = handle.trim() && password && (!isSignup || (name.trim() && agree));
+  const ready = handle.trim() && password && (!isSignup || (name.trim() && agree && password.length >= 8));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,10 +109,9 @@ function AuthPanel({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => v
     setError("");
     onSubmit();
     try {
-      if (isSignup) await signup(name, handle, password);
-      else await login(handle, password);
+      const u = isSignup ? await signup(name, handle, password) : await login(handle, password);
       const b = submitRef.current?.getBoundingClientRect();
-      circleNav(router, "/home", b ? { clientX: b.left + b.width / 2, clientY: b.top + b.height / 2 } : { clientX: 0, clientY: 0 });
+      circleNav(router, u.onboarded ? "/home" : "/welcome", b ? { clientX: b.left + b.width / 2, clientY: b.top + b.height / 2 } : { clientX: 0, clientY: 0 });
     } catch (err) {
       setError(err instanceof ApiError && err.status < 500 && err.message ? err.message : t("auth.error"));
       setBusy(false);
@@ -147,7 +146,7 @@ function AuthPanel({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => v
           </div>
         </div>
         <label className="float" style={{ "--i": 1 } as React.CSSProperties}>
-          <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder=" " autoComplete="username" inputMode="email" autoCapitalize="none" spellCheck={false} maxLength={120} />
+          <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder=" " type="email" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} maxLength={120} />
           <span>{t("auth.handle")}</span>
         </label>
         <label className="float" style={{ "--i": 2 } as React.CSSProperties}>
@@ -160,6 +159,7 @@ function AuthPanel({ onBack, onSubmit }: { onBack: () => void; onSubmit: () => v
             maxLength={200}
           />
           <span>{t("auth.password")}</span>
+          {isSignup && password.length > 0 && password.length < 8 && <small className="float-hint">{t("auth.passwordHint")}</small>}
           <button type="button" className="float-action" onClick={() => setShow((v) => !v)} aria-pressed={show}>{show ? t("auth.hide") : t("auth.show")}</button>
         </label>
 

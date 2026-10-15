@@ -1,6 +1,7 @@
 const BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 
-export type User = { id: string; name: string; handle: string };
+export type MascotKind = "radish" | "cat" | "dog" | "rabbit" | "teddy" | "frog";
+export type User = { id: string; name: string; handle: string; onboarded: boolean; mascot?: MascotKind | null };
 
 export type Chip = { name: string; verbatim: string };
 export type Urgency = "emergency" | "see_doctor_soon" | "routine" | "self_monitor";
@@ -97,6 +98,9 @@ export type CompanionReply = {
   alert: CompanionAlert;
   cycle: CycleStatus | null;
   safe_fallback: boolean;
+  reply_lang: string;
+  conversation_id: string;
+  title: string;
 };
 export type CompanionMessage = {
   role: "user" | "assistant";
@@ -105,7 +109,35 @@ export type CompanionMessage = {
   reply?: string;
   suggestions?: string[];
   question?: string;
-  alert?: CompanionAlert["level"];
+  alert?: CompanionAlert;
+  reply_lang?: string;
+};
+export type Conversation = { id: string; title: string; created_at: number; updated_at: number; has_report: boolean; message_count: number };
+
+export type Regularity = "regular" | "irregular" | "absent" | "not_started" | "unsure";
+export type Profile = {
+  age: number | null;
+  regularity: Regularity | null;
+  concerns: string[];
+  conditions: string[];
+  hormonal_meds: "yes" | "no" | "declined" | null;
+  mascot?: MascotKind | null;
+};
+
+export type Report = {
+  conversation_id: string;
+  title: string;
+  generated_at: number;
+  summary: {
+    summary: string;
+    main_concerns: string[];
+    symptoms: { symptom: string; since: string; her_words: string }[];
+    feelings: string;
+    questions_for_doctor: string[];
+    summary_her_language: string;
+  };
+  suggestions_given: string[];
+  doctor_flags: { level: string; message: string; at: number }[];
 };
 
 export class ApiError extends Error {
@@ -158,11 +190,31 @@ export const api = {
   answer: (session_id: string, question_key: string, answer: unknown) => req<Flow>("/api/answer", json({ session_id, question_key, answer })),
   tts: (text: string, lang: string) => req<{ audio_base64: string; parts: string[]; mime: string }>("/api/tts", json({ text, lang })),
   doctorCard: (session_id: string) => req<DoctorCard>("/api/doctor-card", json({ session_id })),
+  profile: () => req<{ profile: Profile | null; onboarded: boolean }>("/api/profile", withCreds()),
+  saveProfile: (profile: Profile, cycle: CycleSetup | null) =>
+    req<{ profile: Profile; cycle: CycleStatus | null }>("/api/profile", withCreds({ ...json({ profile, cycle }), method: "PUT" })),
   cycle: () => req<{ cycle: CycleStatus | null }>("/api/cycle", withCreds()),
   setupCycle: (s: CycleSetup) => req<{ cycle: CycleStatus }>("/api/cycle", withCreds({ ...json(s), method: "PUT" })),
   logPeriod: (start_date: string) => req<{ cycle: CycleStatus }>("/api/cycle/period", withCreds(json({ start_date }))),
-  companionChat: (text: string, lang: string) => req<CompanionReply>("/api/companion/chat", withCreds(json({ text, lang }))),
-  companionHistory: () => req<{ messages: CompanionMessage[] }>("/api/companion/history", withCreds()),
-  companionForget: () => req<{ ok: boolean }>("/api/companion/history", withCreds({ method: "DELETE" })),
+  removePeriod: (start_date: string) =>
+    req<{ cycle: CycleStatus | null }>(`/api/cycle/period/${encodeURIComponent(start_date)}`, withCreds({ method: "DELETE" })),
+  saveMascot: (mascot: MascotKind) => req<{ mascot: MascotKind }>("/api/profile/mascot", withCreds({ ...json({ mascot }), method: "PUT" })),
+  companionChat: (text: string, lang: string, conversation_id: string | null) =>
+    req<CompanionReply>("/api/companion/chat", withCreds(json({ text, lang, conversation_id }))),
+  conversations: () => req<{ conversations: Conversation[] }>("/api/conversations", withCreds()),
+  conversation: (id: string) =>
+    req<{ conversation: Conversation; messages: CompanionMessage[] }>(`/api/conversations/${encodeURIComponent(id)}`, withCreds()),
+  renameConversation: (id: string, title: string) =>
+    req<{ ok: boolean }>(`/api/conversations/${encodeURIComponent(id)}`, withCreds({ ...json({ title }), method: "PATCH" })),
+  deleteConversation: (id: string) => req<{ ok: boolean }>(`/api/conversations/${encodeURIComponent(id)}`, withCreds({ method: "DELETE" })),
+  clearConversations: () => req<{ ok: boolean }>("/api/conversations", withCreds({ method: "DELETE" })),
+  report: (id: string) => req<{ report: Report }>(`/api/conversations/${encodeURIComponent(id)}/report`, withCreds({ method: "POST" })),
+  reportPdf: async (id: string) => {
+    const res = await fetch(`${BASE}/api/conversations/${encodeURIComponent(id)}/report.pdf`, withCreds());
+    if (!res.ok) throw new ApiError(res.status, res.statusText);
+    const name = /filename="([^"]+)"/.exec(res.headers.get("content-disposition") ?? "")?.[1] ?? "nola-report.pdf";
+    return { blob: await res.blob(), name };
+  },
+  forgetEverything: () => req<{ ok: boolean }>("/api/account/data", withCreds({ method: "DELETE" })),
   myths: (lang: string) => req<{ myths: { id: string; myth: string; fact: string }[] }>(`/api/myths?lang=${encodeURIComponent(lang)}`),
 };

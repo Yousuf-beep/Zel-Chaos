@@ -11,7 +11,7 @@ const knda = Noto_Sans_Kannada({ subsets: ["kannada"], weight: ["400", "500"], v
 const taml = Noto_Sans_Tamil({ subsets: ["tamil"], weight: ["400", "500"], variable: "--font-taml", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Sakhi",
+  title: "Nola",
   description: "Speak or type how you feel, in your own language. Health information and care guidance — never a diagnosis.",
   manifest: "/manifest.json",
   icons: { icon: "/icon.svg", apple: "/icon.svg" },
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StoreProvider>
           <div className="curtain" aria-hidden="true">
             <div className="curtain-word">
-              {"Sakhi".split("").map((c, i) => <span key={i} style={{ "--i": i } as React.CSSProperties}>{c}</span>)}
+              {"Nola".split("").map((c, i) => <span key={i} style={{ "--i": i } as React.CSSProperties}>{c}</span>)}
             </div>
           </div>
           <a className="skip-link" href="#main">Skip to content</a>

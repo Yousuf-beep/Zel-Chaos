@@ -1,0 +1,11 @@
+UI sound effects by Kenney (www.kenney.nl), released under CC0 1.0 (public domain).
+Taken from the ZEL site's sound set (zelagency/zel, brag-output/composition/assets/sfx), renamed:
+  tap      <- Interface Sounds / click_002
+  send     <- Casino Audio / card-place-1
+  receive  <- Interface Sounds / drop_002
+  slide    <- Casino Audio / card-slide-2
+  toggle   <- UI Audio / switch7
+  voice    <- Impact Sounds / impactSoft_medium_001
+  ready    <- Impact Sounds / impactBell_heavy_000
+.m4a copies are AAC transcodes for browsers that cannot play Ogg Vorbis (Safari before iOS 18.4).
+ZEL's ambient/hover/click audio is Lusion reference media and is deliberately not used here.

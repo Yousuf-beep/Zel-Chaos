@@ -47,7 +47,7 @@ export default function DoctorCardView({ card }: { card: DoctorCard }) {
     setCanShare(typeof navigator !== "undefined" && !!navigator.share);
   }, [card.qr_text]);
 
-  const share = () => navigator.share?.({ title: "Sakhi — doctor visit card", text: card.qr_text }).catch(() => undefined);
+  const share = () => navigator.share?.({ title: "Nola — doctor visit card", text: card.qr_text }).catch(() => undefined);
 
   return (
     <>
