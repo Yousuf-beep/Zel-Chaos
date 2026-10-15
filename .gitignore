@@ -9,6 +9,8 @@ node_modules/
 out/
 frontend/next-env.d.ts
 backend/eval/results.md
+backend/eval/dataset_results.md
+backend/eval/data/
 backend/tts_cache/
 backend/data/
 *.tsbuildinfo
