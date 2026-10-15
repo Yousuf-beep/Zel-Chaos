@@ -1,0 +1,25 @@
+{
+  "_note": "Canonical symptom names and colloquial / code-mixed phrases that map to them. Phrases are matched after normalisation. TODO(team): add native-script entries verified by native speakers.",
+  "symptoms": {
+    "missed_periods": {"group": "cycle", "en": "Missed periods", "phrases": ["missed period", "missed periods", "no period", "no periods", "periods not coming", "period not coming", "periods nahi aaye", "period nahi aaya", "nahi aaye", "mahine se nahi", "mc late", "mc nahi", "periods stopped", "haven't had a period", "havent had a period", "mutt aagilla", "mutt barlilla", "period varala"]},
+    "irregular_periods": {"group": "cycle", "en": "Irregular periods", "phrases": ["irregular period", "irregular periods", "periods irregular", "late periods", "period late", "periods late", "mensus problem", "menses problem", "maasik dharm", "periods time pe nahi", "kabhi aate kabhi nahi", "regular illa", "periods are irregular", "cycle irregular"]},
+    "periods_not_started": {"group": "cycle", "en": "Periods not started", "phrases": ["never had a period", "periods never started", "period never started", "never got my period", "periods abhi tak nahi aaye"]},
+    "heavy_periods": {"group": "cycle", "en": "Heavy periods", "phrases": ["heavy periods", "heavy period", "heavy flow", "bahut bleeding hoti", "zyada bleeding"]},
+    "painful_periods": {"group": "cycle", "en": "Painful periods", "phrases": ["painful periods", "period pain", "cramps", "periods mein dard", "period mein dard", "mutt novu", "vali"]},
+    "hirsutism": {"group": "androgen", "en": "Extra facial or body hair", "phrases": ["facial hair", "chin hair", "hair on chin", "upper lip hair", "hair on face", "body hair", "chehre pe baal", "daadhi", "moonch", "mukhada mele kudalu", "mugathil mudi"]},
+    "acne": {"group": "androgen", "en": "Acne", "phrases": ["acne", "pimples", "pimple", "breakouts", "daane", "mohalu", "paru"]},
+    "scalp_hair_thinning": {"group": "androgen", "en": "Hair thinning", "phrases": ["hair thinning", "hair fall", "hair loss", "losing hair", "baal jhad", "baal gir", "kudalu udurutide", "mudi kottudhu"]},
+    "weight_gain_abdominal": {"group": "metabolic", "en": "Weight gain around the belly", "phrases": ["weight gain", "gaining weight", "belly fat", "weight badh", "pet badh", "mota", "tummy fat"]},
+    "acanthosis": {"group": "metabolic", "en": "Dark skin patches", "phrases": ["dark neck", "dark patches", "dark skin on neck", "kaali gardan", "gardan kaali", "neck dark", "dark underarms"]},
+    "skin_tags": {"group": "metabolic", "en": "Skin tags", "phrases": ["skin tags", "skin tag", "masse"]},
+    "family_diabetes": {"group": "metabolic", "en": "Family history of diabetes", "phrases": ["family diabetes", "mother has diabetes", "father has diabetes", "mummy ko sugar", "papa ko sugar", "ghar mein sugar", "diabetes in family"]},
+    "fatigue": {"group": "general", "en": "Tiredness", "phrases": ["tired", "tiredness", "fatigue", "thakan", "thakaan", "kamzori", "weakness", "susthu", "sorvu"]},
+    "low_mood": {"group": "mood", "en": "Low mood", "phrases": ["sad", "low mood", "depressed", "udaas", "mann nahi lagta", "feeling low"]},
+    "anxiety": {"group": "mood", "en": "Anxiety", "phrases": ["anxious", "anxiety", "worried", "tension", "ghabrahat", "chinta"]},
+    "difficulty_conceiving": {"group": "fertility", "en": "Difficulty conceiving", "phrases": ["trying to conceive", "can't get pregnant", "cant get pregnant", "not getting pregnant", "baby nahi ho raha", "conceive nahi"]},
+    "urinary_burning": {"group": "other", "en": "Burning when passing urine", "phrases": ["burning urine", "burning when i pee", "burning while peeing", "pain while urinating", "peshab mein jalan", "urine mein jalan", "frequent urination"]},
+    "abnormal_discharge": {"group": "other", "en": "Unusual discharge", "phrases": ["discharge", "white discharge", "itching", "safed paani", "kharish", "odour", "smell down there"]},
+    "pelvic_pain": {"group": "other", "en": "Pelvic pain", "phrases": ["pelvic pain", "lower abdomen pain", "pet ke neeche dard", "pain during sex"]},
+    "hot_flushes": {"group": "other", "en": "Hot flushes", "phrases": ["hot flushes", "hot flashes", "night sweats", "garmi lagti"]}
+  }
+}

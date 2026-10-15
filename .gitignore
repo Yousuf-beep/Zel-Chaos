@@ -1,0 +1,14 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+node_modules/
+.next/
+out/
+frontend/next-env.d.ts
+backend/eval/results.md
+backend/tts_cache/
+backend/data/
+*.tsbuildinfo

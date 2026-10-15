@@ -1,0 +1,31 @@
+{
+  "emergency": {
+    "numbers": [
+      {"label": "Emergency", "number": "112"},
+      {"label": "Ambulance", "number": "108"}
+    ],
+    "message": {
+      "en-IN": "Please go to the nearest hospital now or call 112 (emergency) / 108 (ambulance).",
+      "hi-IN": "कृपया अभी नज़दीकी अस्पताल जाएँ या 112 (इमरजेंसी) / 108 (एम्बुलेंस) पर कॉल करें।",
+      "kn-IN": "TODO(team): native speaker to write and verify. Falls back to English.",
+      "ta-IN": "TODO(team): native speaker to write and verify. Falls back to English."
+    }
+  },
+  "crisis": {
+    "numbers": [
+      {"label": "Tele-MANAS (free, 24x7)", "number": "14416"},
+      {"label": "Tele-MANAS toll-free", "number": "1-800-891-4416"},
+      {"label": "Emergency", "number": "112"}
+    ],
+    "message": {
+      "en-IN": "Please talk to someone right now. Tele-MANAS is a free, 24x7 mental-health helpline. If you are in immediate danger, call 112.",
+      "hi-IN": "कृपया अभी किसी से बात करें। टेली-मानस एक मुफ़्त, 24x7 मानसिक स्वास्थ्य हेल्पलाइन है। अगर आप तुरंत खतरे में हैं, तो 112 पर कॉल करें।",
+      "kn-IN": "TODO(team): native speaker to write and verify. Falls back to English.",
+      "ta-IN": "TODO(team): native speaker to write and verify. Falls back to English."
+    }
+  },
+  "low_cost": {
+    "en-IN": "Government hospital / Primary Health Centre (PHC), or eSanjeevani (free government teleconsultation)",
+    "hi-IN": "सरकारी अस्पताल / प्राथमिक स्वास्थ्य केंद्र (PHC), या eSanjeevani (मुफ़्त सरकारी टेलीकंसल्टेशन)"
+  }
+}

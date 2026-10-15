@@ -1,0 +1,12 @@
+{
+  "name": "Sakhi — understand your symptoms",
+  "short_name": "Sakhi",
+  "description": "Speak or type how you feel, in your own language. Health information and care guidance, never a diagnosis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f0fa",
+  "theme_color": "#f3f0fa",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

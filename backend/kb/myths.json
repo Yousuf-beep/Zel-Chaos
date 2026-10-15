@@ -1,0 +1,11 @@
+{
+  "_note": "English source. Localise once via Sarvam Translate, cache to this file, and have a native speaker spot-check.",
+  "myths": [
+    {"id": "fertility", "en": {"myth": "PCOS means you can't get pregnant.", "fact": "Many people with PCOS/PMOS conceive. Some need medical support, which a doctor can discuss."}},
+    {"id": "weight", "en": {"myth": "Only women with higher weight get PCOS.", "fact": "It happens across all body sizes."}},
+    {"id": "cysts", "en": {"myth": "PCOS is about cysts on the ovaries.", "fact": "The \"cysts\" are small follicles and many people don't have them. That's one reason it was renamed PMOS in 2026."}},
+    {"id": "teens", "en": {"myth": "Irregular periods in teenagers always mean PCOS.", "fact": "Irregular cycles are common in the first years after periods start. A doctor looks at the bigger picture over time."}},
+    {"id": "only_periods", "en": {"myth": "It only affects periods.", "fact": "It can also affect skin, hair, metabolism, and mood."}},
+    {"id": "nothing_helps", "en": {"myth": "Nothing can be done.", "fact": "Symptoms can be managed. A doctor can explain options that fit you."}}
+  ]
+}

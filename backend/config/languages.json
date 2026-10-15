@@ -1,0 +1,19 @@
+{
+  "_note": "Codes verified against Sarvam docs (Oct 2026). tts_speaker must be a bulbul:v3 voice (lowercase). TODO(team): pick final voices by ear.",
+  "demo_languages": ["en-IN", "hi-IN", "kn-IN", "ta-IN"],
+  "languages": [
+    {"code": "en-IN", "english_name": "English", "native_name": "English", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "hi-IN", "english_name": "Hindi", "native_name": "हिन्दी", "stt": true, "tts": true, "tts_speaker": "ritu"},
+    {"code": "kn-IN", "english_name": "Kannada", "native_name": "ಕನ್ನಡ", "stt": true, "tts": true, "tts_speaker": "roopa"},
+    {"code": "ta-IN", "english_name": "Tamil", "native_name": "தமிழ்", "stt": true, "tts": true, "tts_speaker": "kavitha"},
+    {"code": "te-IN", "english_name": "Telugu", "native_name": "తెలుగు", "stt": true, "tts": true, "tts_speaker": "kavitha"},
+    {"code": "bn-IN", "english_name": "Bengali", "native_name": "বাংলা", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "mr-IN", "english_name": "Marathi", "native_name": "मराठी", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "ml-IN", "english_name": "Malayalam", "native_name": "മലയാളം", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "gu-IN", "english_name": "Gujarati", "native_name": "ગુજરાતી", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "pa-IN", "english_name": "Punjabi", "native_name": "ਪੰਜਾਬੀ", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "od-IN", "english_name": "Odia", "native_name": "ଓଡ଼ିଆ", "stt": true, "tts": true, "tts_speaker": "priya"},
+    {"code": "as-IN", "english_name": "Assamese", "native_name": "অসমীয়া", "stt": true, "tts": false},
+    {"code": "ur-IN", "english_name": "Urdu", "native_name": "اردو", "stt": true, "tts": false}
+  ]
+}

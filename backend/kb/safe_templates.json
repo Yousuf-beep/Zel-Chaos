@@ -1,0 +1,49 @@
+{
+  "_note": "Used when the guardrail fails twice or an external call fails. kn-IN / ta-IN: TODO(team) native speaker to write; English is used until then.",
+  "en-IN": {
+    "see_doctor_soon": {
+      "reflection": "Thank you for sharing how you feel.",
+      "headline": "Please see a doctor within the next few days to 2 weeks.",
+      "who": "A gynaecologist is a good first stop. A government hospital, your nearest PHC, or eSanjeevani are free or low-cost options.",
+      "urgent": ["Very heavy bleeding", "Severe or sudden pain", "Fainting or feeling very dizzy"],
+      "spoken": "Thank you for sharing. Please see a gynaecologist within the next few days to two weeks. A government hospital, your nearest P H C, or eSanjeevani are free options. If you have very heavy bleeding, severe pain, or fainting, go to a hospital right away. This is not a diagnosis."
+    },
+    "routine": {
+      "reflection": "Thank you for sharing how you feel.",
+      "headline": "It's worth booking a doctor's appointment in the coming weeks.",
+      "who": "A gynaecologist is a good first stop. A government hospital, your nearest PHC, or eSanjeevani are free or low-cost options.",
+      "urgent": ["Very heavy bleeding", "Severe or sudden pain", "Fainting or feeling very dizzy"],
+      "spoken": "Thank you for sharing. It's worth booking an appointment with a gynaecologist in the coming weeks. A government hospital, your nearest P H C, or eSanjeevani are free options. If you have very heavy bleeding, severe pain, or fainting, go to a hospital right away. This is not a diagnosis."
+    },
+    "self_monitor": {
+      "reflection": "Thank you for sharing how you feel.",
+      "headline": "Keep track of your symptoms. See a doctor if they continue or get worse.",
+      "who": "If you'd like to talk to someone, a gynaecologist, your nearest PHC, or eSanjeevani can help.",
+      "urgent": ["Very heavy bleeding", "Severe or sudden pain", "Fainting or feeling very dizzy"],
+      "spoken": "Thank you for sharing. Keep a note of your symptoms and period dates. If they continue or get worse, see a doctor. Your nearest P H C or eSanjeevani are free options. If you have very heavy bleeding, severe pain, or fainting, go to a hospital right away. This is not a diagnosis."
+    }
+  },
+  "hi-IN": {
+    "see_doctor_soon": {
+      "reflection": "अपनी बात बताने के लिए धन्यवाद।",
+      "headline": "कृपया अगले कुछ दिनों से 2 हफ़्तों के अंदर डॉक्टर को दिखाएँ।",
+      "who": "स्त्री रोग विशेषज्ञ (गायनेकोलॉजिस्ट) से मिलना अच्छा रहेगा। सरकारी अस्पताल, नज़दीकी PHC या eSanjeevani मुफ़्त या कम खर्च वाले विकल्प हैं।",
+      "urgent": ["बहुत ज़्यादा ब्लीडिंग", "तेज़ या अचानक दर्द", "बेहोशी या बहुत चक्कर आना"],
+      "spoken": "अपनी बात बताने के लिए धन्यवाद। कृपया अगले कुछ दिनों से दो हफ़्तों के अंदर गायनेकोलॉजिस्ट को दिखाएँ। सरकारी अस्पताल, नज़दीकी पी एच सी या eSanjeevani मुफ़्त विकल्प हैं। अगर बहुत ज़्यादा ब्लीडिंग, तेज़ दर्द या बेहोशी हो, तो तुरंत अस्पताल जाएँ। यह कोई निदान नहीं है।"
+    },
+    "routine": {
+      "reflection": "अपनी बात बताने के लिए धन्यवाद।",
+      "headline": "आने वाले हफ़्तों में डॉक्टर से अपॉइंटमेंट लेना अच्छा रहेगा।",
+      "who": "स्त्री रोग विशेषज्ञ (गायनेकोलॉजिस्ट) से मिलना अच्छा रहेगा। सरकारी अस्पताल, नज़दीकी PHC या eSanjeevani मुफ़्त या कम खर्च वाले विकल्प हैं।",
+      "urgent": ["बहुत ज़्यादा ब्लीडिंग", "तेज़ या अचानक दर्द", "बेहोशी या बहुत चक्कर आना"],
+      "spoken": "अपनी बात बताने के लिए धन्यवाद। आने वाले हफ़्तों में गायनेकोलॉजिस्ट से अपॉइंटमेंट लेना अच्छा रहेगा। सरकारी अस्पताल, नज़दीकी पी एच सी या eSanjeevani मुफ़्त विकल्प हैं। अगर बहुत ज़्यादा ब्लीडिंग, तेज़ दर्द या बेहोशी हो, तो तुरंत अस्पताल जाएँ। यह कोई निदान नहीं है।"
+    },
+    "self_monitor": {
+      "reflection": "अपनी बात बताने के लिए धन्यवाद।",
+      "headline": "अपने लक्षणों पर नज़र रखें। अगर ये बने रहें या बढ़ें, तो डॉक्टर को दिखाएँ।",
+      "who": "अगर आप किसी से बात करना चाहें, तो गायनेकोलॉजिस्ट, नज़दीकी PHC या eSanjeevani मदद कर सकते हैं।",
+      "urgent": ["बहुत ज़्यादा ब्लीडिंग", "तेज़ या अचानक दर्द", "बेहोशी या बहुत चक्कर आना"],
+      "spoken": "अपनी बात बताने के लिए धन्यवाद। अपने लक्षण और पीरियड की तारीखें लिखकर रखें। अगर ये बने रहें या बढ़ें, तो डॉक्टर को दिखाएँ। नज़दीकी पी एच सी या eSanjeevani मुफ़्त विकल्प हैं। अगर बहुत ज़्यादा ब्लीडिंग, तेज़ दर्द या बेहोशी हो, तो तुरंत अस्पताल जाएँ। यह कोई निदान नहीं है।"
+    }
+  }
+}

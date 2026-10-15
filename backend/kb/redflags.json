@@ -1,0 +1,66 @@
+{
+  "_note": "Keywords are matched after normalisation (lowercase, NFC, punctuation removed). 'any' = one phrase is enough; 'combos' = every group needs one phrase. TODO(team): add native-script variants in hi/kn/ta and verify each by a native speaker. Do not machine-generate native-script medical keywords.",
+  "flags": [
+    {
+      "id": "heavy_bleeding", "tier": "EMERGENCY",
+      "any": ["soaking a pad every hour", "soaking pad every hour", "soaking through a pad", "pad every hour", "cloth every hour", "large clots", "heavy bleeding", "bleeding a lot", "bahut zyada bleeding", "khoon bahut", "tumba rakta", "romba blood"],
+      "combos": []
+    },
+    {
+      "id": "bleeding_with_faint", "tier": "EMERGENCY",
+      "any": ["fainted", "fainting", "passed out", "behosh", "prajne tappi"],
+      "combos": [
+        ["bleeding", "bleed", "blood", "clots", "khoon", "rakta", "period", "periods"],
+        ["dizzy", "dizziness", "racing heart", "heart racing", "breathless", "chakkar", "tale suttu", "mayakkam"]
+      ]
+    },
+    {
+      "id": "severe_pelvic_pain", "tier": "EMERGENCY",
+      "any": ["severe pain", "unbearable pain", "sudden pain", "severe pelvic pain", "severe stomach pain", "pet mein tez dard", "hotte novu tumba", "vayiru vali romba"],
+      "combos": [["bahut dard", "dard"], ["achanak", "tez", "sahan nahi", "bardasht nahi"]]
+    },
+    {
+      "id": "pregnancy_pain_bleed", "tier": "EMERGENCY",
+      "any": [],
+      "combos": [
+        ["i am pregnant", "im pregnant", "i might be pregnant", "could be pregnant", "maybe pregnant", "might be pregnant", "possibly pregnant", "pregnancy test positive", "positive pregnancy test", "pregnant hoon", "pregnant ho sakti", "garbhvati", "garbhini"],
+        ["pain", "bleeding", "bleed", "spotting", "dard", "khoon", "novu", "vali", "rakta"]
+      ]
+    },
+    {
+      "id": "postpartum_bleed", "tier": "EMERGENCY",
+      "any": ["bleeding after delivery", "bleeding after childbirth", "heavy bleeding after birth", "delivery ke baad bahut bleeding"],
+      "combos": [["after delivery", "after childbirth", "after giving birth", "delivery ke baad"], ["heavy bleeding", "bleeding a lot", "bahut bleeding", "clots"]]
+    },
+    {
+      "id": "chest_breath_headache", "tier": "EMERGENCY",
+      "any": ["chest pain", "cant breathe", "can not breathe", "cannot breathe", "worst headache", "sudden headache", "seene mein dard", "saans nahi"],
+      "combos": []
+    },
+    {
+      "id": "self_harm", "tier": "CRISIS",
+      "any": ["want to die", "kill myself", "hurt myself", "end my life", "suicide", "self harm", "no reason to live", "marna chahti", "khud ko nuksan", "jeena nahi chahti", "sayabeku", "saaganum"],
+      "combos": []
+    },
+    {
+      "id": "fever_pelvic_pain", "tier": "PROMPT",
+      "any": ["foul smelling discharge", "smelly discharge"],
+      "combos": [["fever", "bukhar", "jwara", "kaichal"], ["pelvic pain", "lower abdomen pain", "stomach pain", "pet dard", "pet mein dard", "discharge"]]
+    },
+    {
+      "id": "rapid_virilisation", "tier": "PROMPT",
+      "any": ["voice getting deeper", "voice deepening", "deeper voice", "awaaz bhaari", "rapid hair growth", "hair growing very fast"],
+      "combos": []
+    },
+    {
+      "id": "no_period_by_15", "tier": "PROMPT",
+      "any": ["never had a period", "periods never started", "period never started", "never got my period", "periods abhi tak nahi aaye", "kabhi period nahi aaya"],
+      "combos": []
+    },
+    {
+      "id": "starving_purging", "tier": "PROMPT", "suppress_weight_advice": true,
+      "any": ["starving myself", "not eating", "vomit after eating", "throw up after eating", "make myself vomit", "skip all meals", "khana nahi khati", "khane ke baad ulti"],
+      "combos": []
+    }
+  ]
+}
