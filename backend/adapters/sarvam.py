@@ -134,7 +134,22 @@ class SarvamAdapter:
             raise SpeechError("text-to-speech returned no audio")
         return base64.b64decode(audios[0])
 
+    async def transliterate(self, text: str, lang: str) -> str:
+        """Romanized Indic (e.g. Hinglish) to native script, so the voice pronounces it as Hindi, not English."""
+        out = []
+        for chunk in chunk_text(text, 900):  # the transliterate API takes short inputs
+            res = await self._post("/transliterate", json={"input": chunk, "source_language_code": "en-IN",
+                                                           "target_language_code": lang, "spoken_form": True})
+            out.append(res.get("transliterated_text") or chunk)
+        return " ".join(out)
+
     async def tts(self, text: str, lang: str) -> tuple[bytes, str]:
+        if lang.endswith("-Latn"):
+            lang = lang[:-5]
+            try:
+                text = await self.transliterate(text, lang)
+            except SpeechError as e:
+                log.warning("transliterate failed, speaking romanized text: %s", e)
         if lang not in TTS_LANGS:
             raise SpeechError(f"TTS not available for {lang}")
         chunks = await asyncio.gather(*(self._tts_chunk(c, lang) for c in chunk_text(text)))
