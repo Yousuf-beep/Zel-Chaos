@@ -44,6 +44,11 @@ HISTORY_TTL_DAYS = int(os.getenv("HISTORY_TTL_DAYS", "90"))
 HISTORY_RECENT_TURNS = 12  # messages sent verbatim to the model each turn
 HISTORY_MAX_MESSAGES = 400  # per user, oldest trimmed
 NOTES_EVERY_MESSAGES = 10  # refresh the long-term notes summary this often
+# AES-256-GCM key (urlsafe base64 of 32 bytes) for chat text, titles, reports and the onboarding profile at rest.
+# Required with DATABASE_URL. Generate: python -c "import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())"
+DATA_ENCRYPTION_KEY = os.getenv("DATA_ENCRYPTION_KEY", "").strip()
+LOGIN_MAX_FAILURES = 8  # per email and per IP, within LOGIN_WINDOW_MIN
+LOGIN_WINDOW_MIN = 15
 
 FFMPEG_PATH = os.getenv("FFMPEG_PATH", "").strip() or shutil.which("ffmpeg") or ""
 if FFMPEG_PATH and not Path(FFMPEG_PATH).is_file():
@@ -67,6 +72,7 @@ TTS_MAX_CHARS = 2500
 
 KB_DIR = BASE_DIR / "kb"
 PROMPTS_DIR = BASE_DIR / "prompts"
+ASSETS_DIR = BASE_DIR / "assets"
 
 
 def load_json(path: Path):
