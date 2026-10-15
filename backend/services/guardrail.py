@@ -6,7 +6,7 @@ from typing import Awaitable, Callable, Optional
 import config
 from models.schemas import GuardrailVerdict, ResultCard
 
-log = logging.getLogger("sakhi.guardrail")
+log = logging.getLogger("nola.guardrail")
 _TEMPLATES = config.load_json(config.KB_DIR / "safe_templates.json")
 
 # Required disclaimers ("not a diagnosis") would otherwise trip the diagnostic pattern, so they are removed before scanning.

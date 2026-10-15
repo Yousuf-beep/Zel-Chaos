@@ -2,7 +2,7 @@
 
 Dataset: "Polycystic ovary syndrome (PCOS)" by Prasoon Kottarathil (Kaggle) — 541 women from 10 hospitals in
 Kerala, India, with a doctor's PCOS (Y/N) label. Only the self-reportable columns are used; labs and ultrasound
-are ignored because Sakhi can never observe them. The licence is unclear, so the CSV is downloaded on first run
+are ignored because Nola can never observe them. The licence is unclear, so the CSV is downloaded on first run
 into eval/data/ (git-ignored) and verified by hash, never committed.
 
 Usage: python eval/validate_rules.py [--csv PATH]
@@ -27,7 +27,7 @@ DATA_URL = ("https://raw.githubusercontent.com/Arpita-Mallick/Polycystic-Ovary-S
 DATA_SHA256 = "4c2b8fddb281239f1cfba6581deb5b429f95a152f63b2e9f06749d7b75928d8d"
 DATA_PATH = ROOT / "eval" / "data" / "pcos_kerala.csv"
 
-# Dataset Y/N column -> Sakhi canonical symptom name (see kb/glossary.json).
+# Dataset Y/N column -> Nola canonical symptom name (see kb/glossary.json).
 SYMPTOM_COLUMNS = {
     "hair growth(Y/N)": "hirsutism",
     "Pimples(Y/N)": "acne",
@@ -59,7 +59,7 @@ def load(path: Path) -> list[dict]:
 
 
 def to_extraction(row: dict) -> ExtractionResult:
-    """What Sakhi would know if this woman described only her self-reportable symptoms."""
+    """What Nola would know if this woman described only her self-reportable symptoms."""
     ex = ExtractionResult(pregnancy_possible="no")
     if row.get("Age (yrs)", "").isdigit():
         ex.age = int(row["Age (yrs)"])
@@ -78,7 +78,7 @@ def predictions(ex: ExtractionResult) -> dict[str, bool]:
     sig = ex.pcos_pattern_signals
     level, _ = rules.urgency_baseline(ex, rules.scan_extracted(ex))
     return {
-        "Sakhi baseline >= routine (live rule)": URGENCY_ORDER[level] >= URGENCY_ORDER["routine"],
+        "Nola baseline >= routine (live rule)": URGENCY_ORDER[level] >= URGENCY_ORDER["routine"],
         "Cycle + androgen (guideline pattern)": sig.cycle_irregularity and sig.androgen_signs,
         "Any 2 of cycle / androgen / metabolic": sum((sig.cycle_irregularity, sig.androgen_signs, sig.metabolic_signs)) >= 2,
         "Cycle irregularity alone": sig.cycle_irregularity,
@@ -111,10 +111,10 @@ def evaluate(rows: list[dict]) -> tuple[dict, dict, int, int]:
 
 def report(confusion: dict, feature: Counter, pos: int, neg: int) -> str:
     pct = lambda x: f"{100 * x:.0f}%"  # noqa: E731
-    out = ["# Sakhi rules vs. labelled PCOS data", "",
+    out = ["# Nola rules vs. labelled PCOS data", "",
            f"Dataset: Kottarathil PCOS dataset (Kerala, India), {pos + neg} women, {pos} with a PCOS diagnosis, {neg} without.",
            "Only self-reportable columns are used (cycle regularity, hair growth, pimples, hair loss, skin darkening, weight gain).",
-           "Sakhi is a care-navigation tool, so **sensitivity** (diagnosed women who would be told to see a doctor) matters most;",
+           "Nola is a care-navigation tool, so **sensitivity** (diagnosed women who would be told to see a doctor) matters most;",
            "low specificity means extra doctor visits, not missed cases. The sample is hospital-based, so PPV is higher than in the general population.", "",
            "| Rule | Sensitivity | Specificity | PPV | NPV | TP | FP | FN | TN |", "|---|---|---|---|---|---|---|---|---|"]
     for rule, c in confusion.items():

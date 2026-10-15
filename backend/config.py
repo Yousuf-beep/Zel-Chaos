@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR.parent / ".env")
 load_dotenv(BASE_DIR / ".env")
 
-APP_NAME = "Sakhi"
+APP_NAME = "Nola"
 
 
 def _bool(name: str, default: bool) -> bool:
@@ -61,7 +61,7 @@ STT_MAX_SECONDS = 29.5  # Sarvam REST STT accepts clips under 30 s.
 DEMO_MODE = _bool("DEMO_MODE", False)
 MAX_FOLLOWUPS = int(os.getenv("MAX_FOLLOWUPS", "4"))
 SESSION_TTL_MIN = int(os.getenv("SESSION_TTL_MIN", "30"))
-AUTH_DB_PATH = os.getenv("AUTH_DB_PATH", "").strip() or str(BASE_DIR / "data" / "sakhi.db")
+AUTH_DB_PATH = os.getenv("AUTH_DB_PATH", "").strip() or str(BASE_DIR / "data" / "nola.db")
 AUTH_TTL_DAYS = int(os.getenv("AUTH_TTL_DAYS", "30"))
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",") if o.strip()]
 

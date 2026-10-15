@@ -163,6 +163,11 @@ class LoginRequest(BaseModel):
 class CompanionRequest(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
     lang: str = "en-IN"
+    conversation_id: Optional[str] = Field(None, max_length=64)
+
+
+class TitleRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=80)
 
 
 class PeriodStartRequest(BaseModel):

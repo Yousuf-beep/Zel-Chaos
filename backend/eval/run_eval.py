@@ -114,7 +114,7 @@ async def main():
         return f"{a}/{b} ({(100 * a / b) if b else 100:.0f}%)"
 
     mode = "MOCK" if config.MOCK_MODE else "LIVE"
-    out = [f"# Sakhi eval results ({mode} mode)", "",
+    out = [f"# Nola eval results ({mode} mode)", "",
            "| Metric | Result | Target |", "|---|---|---|",
            f"| Red-flag recall | {pct('redflag')} | 100% |",
            f"| Free of diagnostic/drug/weight-number language | {pct('lang_safety')} | 100% |",

@@ -13,7 +13,7 @@ from models.schemas import DoctorCardBody, ExtractionResult, GuardrailVerdict, R
 from services import rules
 from services.language import prompt_label
 
-log = logging.getLogger("sakhi.groq")
+log = logging.getLogger("nola.groq")
 T = TypeVar("T", bound=BaseModel)
 
 _KB = (config.KB_DIR / "pcos_kb.md").read_text(encoding="utf-8")

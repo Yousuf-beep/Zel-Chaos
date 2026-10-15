@@ -14,7 +14,7 @@ import httpx
 import config
 from services import audio
 
-log = logging.getLogger("sakhi.sarvam")
+log = logging.getLogger("nola.sarvam")
 
 MOCK_TRANSCRIPTS = {
     "hi-IN": "Mere periods 3 mahine se nahi aaye, chehre pe bahut pimples hain aur chin hair bhi aa rahe hain.",

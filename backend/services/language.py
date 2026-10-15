@@ -13,7 +13,7 @@ import httpx
 
 import config
 
-log = logging.getLogger("sakhi.language")
+log = logging.getLogger("nola.language")
 
 _SCRIPTS = [  # (unicode range, language code, script name)
     (r"[ऀ-ॿ]", "hi-IN", "Devanagari"), (r"[ঀ-৿]", "bn-IN", "Bengali"),

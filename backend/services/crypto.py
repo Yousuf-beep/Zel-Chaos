@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 import config
 
-log = logging.getLogger("sakhi.crypto")
+log = logging.getLogger("nola.crypto")
 PREFIX = "enc1:"
 
 

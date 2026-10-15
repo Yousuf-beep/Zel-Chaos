@@ -1,4 +1,4 @@
-"""Sakhi companion chat: sentiment-first support that listens, reassures and suggests, but never diagnoses or prescribes.
+"""Nola, the companion chat: sentiment-first support that listens, reassures and suggests, but never diagnoses or prescribes.
 Safety order: deterministic red-flag scan -> model reply -> regex guardrail (one regeneration, then a safe reply).
 The alert level is the higher of the rules and the model; the model can raise it, never lower it."""
 import asyncio
@@ -13,8 +13,9 @@ from services import guardrail, rules
 from services.cycle import CycleStatus, cycles, describe
 from services.language import base_code, detector, is_romanized, prompt_label
 from services.memory import Memory, memory as default_memory
+from services.profile import ProfileStore, describe as describe_profile, profiles as default_profiles
 
-log = logging.getLogger("sakhi.companion")
+log = logging.getLogger("nola.companion")
 
 Sentiment = Literal["positive", "neutral", "worried", "anxious", "sad", "frustrated", "embarrassed", "distressed"]
 AlertLevel = Literal["none", "soon", "now", "emergency", "crisis"]
@@ -29,6 +30,7 @@ class CompanionTurn(BaseModel):
     doctor_reason: str = ""
     suggestions: list[str] = Field(default_factory=list)
     question: str = ""
+    title: str = ""  # only on the first turn of a new chat
 
     @field_validator("sentiment", mode="before")
     @classmethod
@@ -41,7 +43,7 @@ class CompanionTurn(BaseModel):
         return [s.strip() for s in v if s and s.strip()][:3]
 
     def texts(self) -> list[str]:
-        return [self.reply, self.doctor_reason, self.question, *self.suggestions]
+        return [self.reply, self.doctor_reason, self.question, self.title, *self.suggestions]
 
     def as_history_text(self) -> str:
         parts = [self.reply]
@@ -68,6 +70,8 @@ class CompanionResponse(BaseModel):
     cycle: Optional[CycleStatus] = None
     safe_fallback: bool = False
     reply_lang: str = "en-IN"  # detected from her message, e.g. hi-IN-Latn for Hinglish
+    conversation_id: str = ""
+    title: str = ""
 
 
 _NOW_MSG = {"hi-IN-Latn": "Please aaj hi kisi doctor se baat karo. Agar takleef zyada hai ya badh rahi hai, toh nazdeeki hospital jao ya 112 / 108 par call karo.",
@@ -131,7 +135,7 @@ class MockCompanion:
                        "A few minutes of slow breathing or a short walk can ease stress."]
         return CompanionTurn(reply="Thank you for sharing this with me. It makes sense to feel this way, and you did the right thing by talking about it.",
                              sentiment=sentiment, distress=distress, suggestions=suggestions,
-                             question="How long have you been feeling like this?")
+                             question="How long have you been feeling like this?", title=_fallback_title(text) if not history else "")
 
     async def notes(self, previous: str, convo: str) -> str:
         return previous
@@ -161,31 +165,49 @@ def _fmt_date(ts: float) -> str:
     return datetime.fromtimestamp(ts).strftime("%d %b %Y")
 
 
+def _fallback_title(text: str) -> str:
+    words = text.strip().split()
+    title = " ".join(words[:6])
+    return (title[:48].rstrip() + ("…" if len(words) > 6 or len(title) > 48 else "")) or "New chat"
+
+
 class Companion:
-    def __init__(self, engine=None, mem: Memory | None = None):
+    def __init__(self, engine=None, mem: Memory | None = None, profile_store: ProfileStore | None = None):
         self.engine = engine or (MockCompanion() if config.MOCK_LLM else GroqCompanion())
         self.memory = mem or default_memory
+        self.profiles = profile_store or default_profiles
         self._notes_tasks: set[asyncio.Task] = set()
 
-    async def _system(self, uid: str, name: str, lang: str, text: str, cyc: Optional[CycleStatus], flags: list) -> str:
+    async def _system(self, uid: str, name: str, lang: str, text: str, cyc: Optional[CycleStatus], flags: list,
+                      recent: list[dict]) -> str:
         from adapters.groq import render
-        recall = await self.memory.search(uid, text, skip_recent=config.HISTORY_RECENT_TURNS)
+        recall = await self.memory.search(uid, text, exclude_ids={m["id"] for m in recent})
         recall_txt = "\n".join(f"- ({_fmt_date(m['at'])}) \"{m['text'][:300]}\"" for m in recall) or "(nothing relevant)"
         safety = ", ".join(f"{f.id} ({f.tier})" for f in flags) or "none"
         return render("companion", LANG_NAME=prompt_label(lang), TODAY=date.today().strftime("%A, %d %B %Y"),
                       NAME=name or "(not shared)", CYCLE=describe(cyc) if cyc else "She has not set up cycle tracking yet.",
+                      PROFILE=describe_profile(await self.profiles.get(uid)),
                       NOTES=(await self.memory.notes(uid)) or "(first conversation, nothing yet)",
-                      RECALL=recall_txt, SAFETY=safety)
+                      RECALL=recall_txt, SAFETY=safety,
+                      NEW_CHAT="yes, this is her first message in a new chat" if not recent else "no")
 
-    async def chat(self, uid: str, name: str, text: str, lang: str) -> CompanionResponse:
+    async def chat(self, uid: str, name: str, text: str, lang: str, conversation_id: Optional[str] = None) -> CompanionResponse:
+        """Raises KeyError when conversation_id is not one of hers. Without one, a new conversation is started."""
         text = text.strip()
-        recent = await self.memory.messages(uid, last=config.HISTORY_RECENT_TURNS)
+        if conversation_id:
+            conv = await self.memory.conversation(uid, conversation_id)
+            if conv is None:
+                raise KeyError(conversation_id)
+        else:
+            conv = await self.memory.create_conversation(uid)
+        cid = conv["id"]
+        recent = await self.memory.messages(uid, cid, last=config.HISTORY_RECENT_TURNS)
         previous = next((m.get("reply_lang") for m in reversed(recent) if m["role"] == "user" and m.get("reply_lang")), None)
         lang = (await detector.detect(text, lang, previous)).code  # e.g. hi-IN-Latn when she types Hinglish
         flags = rules.scan(text, lang)
         cyc = await cycles.status(uid)
         history = [{"role": m["role"], "content": m["text"]} for m in recent]
-        system = await self._system(uid, name, lang, text, cyc, flags)
+        system = await self._system(uid, name, lang, text, cyc, flags, recent)
 
         turn, fallback = None, False
         prompt_text = text
@@ -211,14 +233,18 @@ class Companion:
         if alert.level in ("emergency", "crisis"):
             turn.suggestions = []  # in an emergency the only advice is to get help now
 
-        await self.memory.append(uid, "user", text, sentiment=turn.sentiment, distress=turn.distress, flags=[f.id for f in flags],
+        await self.memory.append(uid, cid, "user", text, sentiment=turn.sentiment, distress=turn.distress, flags=[f.id for f in flags],
                                  reply_lang=lang)
-        await self.memory.append(uid, "assistant", turn.as_history_text(), alert=alert.level, reply=turn.reply,
-                                 suggestions=turn.suggestions, question=turn.question)
+        await self.memory.append(uid, cid, "assistant", turn.as_history_text(), alert=alert.model_dump(), reply=turn.reply,
+                                 suggestions=turn.suggestions, question=turn.question, reply_lang=lang)
+        title = conv["title"]
+        if not title:
+            title = (turn.title.strip() if not fallback else "") or _fallback_title(text)
+            await self.memory.set_title(uid, cid, title)
         self._maybe_refresh_notes(uid)
         return CompanionResponse(reply=turn.reply, suggestions=turn.suggestions, question=turn.question,
                                  sentiment=turn.sentiment, distress=turn.distress, alert=alert, cycle=cyc,
-                                 safe_fallback=fallback, reply_lang=lang)
+                                 safe_fallback=fallback, reply_lang=lang, conversation_id=cid, title=title[:80])
 
     def _maybe_refresh_notes(self, uid: str) -> None:
         async def run():
@@ -236,9 +262,15 @@ class Companion:
         self._notes_tasks.add(task)
         task.add_done_callback(self._notes_tasks.discard)
 
-    async def history(self, uid: str) -> list[dict]:
-        keep = ("role", "text", "at", "alert", "reply", "suggestions", "question", "sentiment")
-        return [{k: m[k] for k in keep if k in m} for m in await self.memory.messages(uid, last=60)]
+    async def history(self, uid: str, cid: str) -> list[dict]:
+        keep = ("role", "text", "at", "alert", "reply", "suggestions", "question", "reply_lang")
+        out = []
+        for m in await self.memory.messages(uid, cid):
+            item = {k: m[k] for k in keep if k in m}
+            if isinstance(item.get("alert"), str):  # older rows kept only the level
+                item["alert"] = {"level": item["alert"], "message": "", "numbers": []}
+            out.append(item)
+        return out
 
     async def forget(self, uid: str) -> None:
         await self.memory.clear(uid)

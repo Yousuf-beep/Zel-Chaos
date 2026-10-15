@@ -1,6 +1,6 @@
-"""One-off copy of the old local SQLite data (backend/data/sakhi.db) into Supabase Postgres.
+"""One-off copy of the old local SQLite data (backend/data/nola.db) into Supabase Postgres.
 
-Usage (from backend/):  python scripts/migrate_sqlite_to_supabase.py [path/to/sakhi.db] [--dry-run]
+Usage (from backend/):  python scripts/migrate_sqlite_to_supabase.py [path/to/nola.db] [--dry-run]
 
 Safe to re-run: every insert is ON CONFLICT DO NOTHING, so rows already in Postgres are left alone.
 Expired login tokens are skipped. Chat history was never in SQLite, so there is nothing to copy for it."""
@@ -53,18 +53,18 @@ async def main(path: Path, dry_run: bool) -> None:
     try:
         async with con.transaction():
             r_users = await con.executemany(
-                "INSERT INTO sakhi.users (id, name, handle, pw_hash, salt, created_at) VALUES ($1, $2, $3, $4, $5, $6) "
+                "INSERT INTO nola.users (id, name, handle, pw_hash, salt, created_at) VALUES ($1, $2, $3, $4, $5, $6) "
                 "ON CONFLICT DO NOTHING", [(u[0], u[1], u[2], bytes(u[3]), bytes(u[4]), _ts(u[5])) for u in users])
             await con.executemany(
-                "INSERT INTO sakhi.auth_tokens (token_hash, user_id, expires_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+                "INSERT INTO nola.auth_tokens (token_hash, user_id, expires_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
                 [(t[0], t[1], _ts(t[2])) for t in tokens if t[1] in user_ids])
             await con.executemany(
-                "INSERT INTO sakhi.cycle_profiles (user_id, cycle_length, period_length, updated_at) VALUES ($1, $2, $3, $4) "
+                "INSERT INTO nola.cycle_profiles (user_id, cycle_length, period_length, updated_at) VALUES ($1, $2, $3, $4) "
                 "ON CONFLICT DO NOTHING", [(p[0], p[1], p[2], _ts(p[3])) for p in profiles if p[0] in user_ids])
             await con.executemany(
-                "INSERT INTO sakhi.period_starts (user_id, start_date) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+                "INSERT INTO nola.period_starts (user_id, start_date) VALUES ($1, $2) ON CONFLICT DO NOTHING",
                 [(s[0], datetime.fromisoformat(s[1]).date()) for s in starts if s[0] in user_ids])
-        counts = {t: await con.fetchval(f"SELECT count(*) FROM sakhi.{t}")
+        counts = {t: await con.fetchval(f"SELECT count(*) FROM nola.{t}")
                   for t in ("users", "auth_tokens", "cycle_profiles", "period_starts")}
         print("Postgres now has:", counts)
     finally:
@@ -73,4 +73,4 @@ async def main(path: Path, dry_run: bool) -> None:
 
 if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    asyncio.run(main(Path(args[0]) if args else Path(config.BASE_DIR / "data" / "sakhi.db"), "--dry-run" in sys.argv))
+    asyncio.run(main(Path(args[0]) if args else Path(config.BASE_DIR / "data" / "nola.db"), "--dry-run" in sys.argv))

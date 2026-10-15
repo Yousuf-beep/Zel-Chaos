@@ -5,4 +5,7 @@ pydantic>=2.8
 asyncpg>=0.29
 python-multipart>=0.0.9
 python-dotenv>=1.0
+cryptography>=42.0
+fpdf2>=2.8
+uharfbuzz>=0.39
 pytest>=8.0

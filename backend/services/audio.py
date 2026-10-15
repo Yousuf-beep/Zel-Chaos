@@ -16,7 +16,7 @@ from pathlib import Path
 
 import config
 
-log = logging.getLogger("sakhi.audio")
+log = logging.getLogger("nola.audio")
 TARGET_RATE = 16000
 
 

@@ -95,47 +95,47 @@ def _as_date(v) -> date:
 
 
 class CycleStore:
-    """sakhi.cycle_profiles + sakhi.period_starts."""
+    """nola.cycle_profiles + nola.period_starts."""
 
     def __init__(self, database: Database | None = None):
         self.db = database or default_db
 
     async def setup(self, user_id: str, s: CycleSetup) -> CycleStatus:
         await self.db.execute(
-            "INSERT INTO sakhi.cycle_profiles (user_id, cycle_length, period_length, updated_at) VALUES (%s, %s, %s, CURRENT_TIMESTAMP) "
+            "INSERT INTO nola.cycle_profiles (user_id, cycle_length, period_length, updated_at) VALUES (%s, %s, %s, CURRENT_TIMESTAMP) "
             "ON CONFLICT (user_id) DO UPDATE SET cycle_length = excluded.cycle_length, "
             "period_length = excluded.period_length, updated_at = CURRENT_TIMESTAMP",
             user_id, s.cycle_length, s.period_length)
-        await self.db.execute("INSERT INTO sakhi.period_starts (user_id, start_date) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+        await self.db.execute("INSERT INTO nola.period_starts (user_id, start_date) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                               user_id, s.last_period_start)
         return await self.status(user_id)  # type: ignore[return-value]
 
     async def log_start(self, user_id: str, start: date) -> Optional[CycleStatus]:
-        if not await self.db.fetchone("SELECT 1 FROM sakhi.cycle_profiles WHERE user_id = %s", user_id):
+        if not await self.db.fetchone("SELECT 1 FROM nola.cycle_profiles WHERE user_id = %s", user_id):
             return None
-        await self.db.execute("INSERT INTO sakhi.period_starts (user_id, start_date) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+        await self.db.execute("INSERT INTO nola.period_starts (user_id, start_date) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                               user_id, start)
         return await self.status(user_id)
 
     async def remove_start(self, user_id: str, start: date) -> Optional[CycleStatus]:
         # The profile always keeps at least one start date.
         await self.db.execute(
-            "DELETE FROM sakhi.period_starts WHERE user_id = %s AND start_date = %s "
-            "AND (SELECT COUNT(*) FROM sakhi.period_starts WHERE user_id = %s) > 1",
+            "DELETE FROM nola.period_starts WHERE user_id = %s AND start_date = %s "
+            "AND (SELECT COUNT(*) FROM nola.period_starts WHERE user_id = %s) > 1",
             user_id, start, user_id)
         return await self.status(user_id)
 
     async def status(self, user_id: str, today: Optional[date] = None) -> Optional[CycleStatus]:
-        row = await self.db.fetchone("SELECT cycle_length, period_length FROM sakhi.cycle_profiles WHERE user_id = %s", user_id)
+        row = await self.db.fetchone("SELECT cycle_length, period_length FROM nola.cycle_profiles WHERE user_id = %s", user_id)
         if not row:
             return None
         starts = [_as_date(r[0]) for r in await self.db.fetchall(
-            "SELECT start_date FROM sakhi.period_starts WHERE user_id = %s ORDER BY start_date DESC LIMIT 24", user_id)]
+            "SELECT start_date FROM nola.period_starts WHERE user_id = %s ORDER BY start_date DESC LIMIT 24", user_id)]
         return compute_status(starts, row[0], row[1], today) if starts else None
 
     async def delete(self, user_id: str) -> None:
-        await self.db.execute("DELETE FROM sakhi.period_starts WHERE user_id = %s", user_id)
-        await self.db.execute("DELETE FROM sakhi.cycle_profiles WHERE user_id = %s", user_id)
+        await self.db.execute("DELETE FROM nola.period_starts WHERE user_id = %s", user_id)
+        await self.db.execute("DELETE FROM nola.cycle_profiles WHERE user_id = %s", user_id)
 
 
 cycles = CycleStore()

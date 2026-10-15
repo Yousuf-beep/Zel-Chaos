@@ -24,18 +24,18 @@ def test_irregular_cycle_and_hair_growth_map_to_signals():
     ex = vr.to_extraction(row(cycle="4", hirsutism=1))
     assert ex.cycle.pattern == "irregular"
     assert ex.pcos_pattern_signals.cycle_irregularity and ex.pcos_pattern_signals.androgen_signs
-    assert vr.predictions(ex)["Sakhi baseline >= routine (live rule)"]
+    assert vr.predictions(ex)["Nola baseline >= routine (live rule)"]
 
 
 def test_regular_cycle_with_acne_only_stays_self_monitor():
     ex = vr.to_extraction(row(acne=1))
     assert ex.cycle.pattern == "regular"
-    assert not vr.predictions(ex)["Sakhi baseline >= routine (live rule)"]
+    assert not vr.predictions(ex)["Nola baseline >= routine (live rule)"]
 
 
 def test_evaluate_counts_confusion():
     rows = [row("1", "4", hirsutism=1), row("1", "2", acne=1), row("0", "4", acne=1), row("0", "2")]
     confusion, _, pos, neg = vr.evaluate(rows)
-    c = confusion["Sakhi baseline >= routine (live rule)"]
+    c = confusion["Nola baseline >= routine (live rule)"]
     assert (pos, neg) == (2, 2)
     assert (c["tp"], c["fn"], c["fp"], c["tn"]) == (1, 1, 1, 1)

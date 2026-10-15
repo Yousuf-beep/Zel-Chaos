@@ -1,5 +1,5 @@
 """Database access. Supabase Postgres (asyncpg pool) when DATABASE_URL is set; otherwise a local SQLite file, used by
-tests and offline development. SQL is written once: `%s` placeholders and `sakhi.` table prefixes, rewritten for SQLite.
+tests and offline development. SQL is written once: `%s` placeholders and `nola.` table prefixes, rewritten for SQLite.
 The Postgres schema lives in supabase/migrations; the SQLite schema below mirrors it."""
 import asyncio
 import json
@@ -13,7 +13,7 @@ from typing import Any, Optional
 
 import config
 
-log = logging.getLogger("sakhi.db")
+log = logging.getLogger("nola.db")
 
 _SQLITE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT NOT NULL, handle TEXT NOT NULL UNIQUE,
@@ -24,6 +24,16 @@ CREATE TABLE IF NOT EXISTS cycle_profiles (user_id TEXT PRIMARY KEY, cycle_lengt
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS period_starts (user_id TEXT NOT NULL, start_date TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (user_id, start_date));
+CREATE TABLE IF NOT EXISTS conversations (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, title TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL, updated_at TEXT NOT NULL, report TEXT, report_msg_count INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX IF NOT EXISTS conversations_user_idx ON conversations (user_id, updated_at);
+CREATE TABLE IF NOT EXISTS chat_messages (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL,
+  conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE, role TEXT NOT NULL, text TEXT NOT NULL,
+  meta TEXT NOT NULL DEFAULT '{}', created_at TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS chat_messages_conv_idx ON chat_messages (conversation_id, id);
+CREATE TABLE IF NOT EXISTS companion_notes (user_id TEXT PRIMARY KEY, notes TEXT NOT NULL DEFAULT '',
+  since_refresh INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS profiles (user_id TEXT PRIMARY KEY, data TEXT NOT NULL, updated_at TEXT NOT NULL);
 """
 _PARAM = re.compile(r"%s")
 
@@ -95,7 +105,7 @@ class Database:
             self._pool = None
 
     def _sqlite_run(self, sql: str, params: tuple, fetch: str):
-        sql = sql.replace("sakhi.", "").replace("%s", "?")
+        sql = sql.replace("nola.", "").replace("%s", "?")
         with self._sqlite_lock:
             cur = self._sqlite.execute(sql, tuple(_sqlite_value(p) for p in params))
             rows = cur.fetchall() if fetch == "all" else cur.fetchone() if fetch == "one" else cur.rowcount

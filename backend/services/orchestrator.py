@@ -10,7 +10,7 @@ from services import followups, guardrail, rules
 from services.language import detector
 from services.session import Session, store
 
-log = logging.getLogger("sakhi.flow")
+log = logging.getLogger("nola.flow")
 
 
 class Orchestrator:

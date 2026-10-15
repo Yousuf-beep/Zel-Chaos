@@ -61,7 +61,8 @@ def test_companion_reply_is_saved_and_recalled():
     r = run(c.chat("u1", "Asha", "I feel worried, my sleep is bad and periods are late", "en-IN"))
     assert r.reply and r.question and r.sentiment == "worried"
     assert r.alert.level == "none"
-    h = run(c.history("u1"))
+    assert r.conversation_id and r.title
+    h = run(c.history("u1", r.conversation_id))
     assert [m["role"] for m in h] == ["user", "assistant"]
     assert h[1]["suggestions"]
 
@@ -103,10 +104,10 @@ def test_older_messages_are_recalled_into_prompt():
     mem = Memory()
     eng = Scripted(*[CompanionTurn(reply="ok") for _ in range(16)])
     c = Companion(engine=eng, mem=mem)
-    run(c.chat("u7", "", "my exams are stressing me and I get headaches", "en-IN"))
+    cid = run(c.chat("u7", "", "my exams are stressing me and I get headaches", "en-IN")).conversation_id
     for i in range(14):
-        run(c.chat("u7", "", f"just checking in {i}", "en-IN"))
-    run(c.chat("u7", "", "the exams stress is back again", "en-IN"))
+        run(c.chat("u7", "", f"just checking in {i}", "en-IN", cid))
+    run(c.chat("u7", "", "the exams stress is back again", "en-IN", cid))
     system = eng.prompts[-1][0]
     assert "headaches" in system  # older than the recent window, found by recall
 

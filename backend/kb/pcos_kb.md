@@ -1,4 +1,4 @@
-Curated reference content for Sakhi. Sources: 2023 International Evidence-based Guideline for the Assessment and Management of PCOS (Monash/CREPCOS, published 2023); PMOS renaming consensus (The Lancet, May 2026). Reviewed by: [TEAM TO FILL — clinician name if obtained]. This content is for health information and care navigation only, not diagnosis.
+Curated reference content for Nola. Sources: 2023 International Evidence-based Guideline for the Assessment and Management of PCOS (Monash/CREPCOS, published 2023); PMOS renaming consensus (The Lancet, May 2026). Reviewed by: [TEAM TO FILL — clinician name if obtained]. This content is for health information and care navigation only, not diagnosis.
 
 ## 1. What it is
 - PCOS, now renamed PMOS (Polyendocrine Metabolic Ovarian Syndrome), is a common, long-term hormonal and metabolic condition. It affects about 1 in 8 women worldwide. Indian studies report widely varying prevalence (roughly 9%–36% depending on population and criteria), and many cases go undiagnosed because of low awareness.
