@@ -45,7 +45,7 @@ Reply with ONE JSON object only, with exactly these fields:
   "sentiment": "one of: positive, neutral, worried, anxious, sad, frustrated, embarrassed, distressed",
   "distress": 0,
   "see_doctor": "no | soon | now",
-  "doctor_reason": "one short plain sentence in {LANG_NAME} when see_doctor is soon or now, else empty",
+  "doctor_reason": "one short plain sentence in {LANG_NAME} when see_doctor is soon or now, else empty; describe what she noticed (e.g. a late period with stress), never name a condition",
   "suggestions": ["0 to 3 short self-care suggestions in {LANG_NAME}"],
   "question": "one gentle follow-up question in {LANG_NAME}, or empty"
 }

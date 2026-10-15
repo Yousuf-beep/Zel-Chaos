@@ -54,7 +54,7 @@ function CycleSetupForm({ initial, onDone, onSkip }: { initial?: CycleStatus | n
           <input type="number" inputMode="numeric" min={1} max={15} required value={periodLen} onChange={(e) => setPeriodLen(Number(e.target.value))} />
         </label>
       </div>
-      <p className="hint">{t("cycle.notSure")}</p>
+      <p className="c-hint">{t("cycle.notSure")}</p>
       {err && <p className="notice" role="alert">{err}</p>}
       <div className="cycle-setup-actions">
         <button className="pill pill-accent" type="submit" disabled={busy || !start}>{t("cycle.save")} <span className="arrow">↗</span></button>
@@ -105,8 +105,8 @@ function CycleStrip({ cycle, onChange, onEdit }: { cycle: CycleStatus; onChange:
           <button className="pill pill-ghost" onClick={() => log(date)}>{t("cycle.save")}</button>
         </div>
       )}
-      {note && <p className="hint" role="status">{note}</p>}
-      <p className="hint">{t("cycle.estimate")}</p>
+      {note && <p className="c-hint" role="status">{note}</p>}
+      <p className="c-hint">{t("cycle.estimate")}</p>
     </section>
   );
 }
@@ -272,7 +272,7 @@ export default function CompanionChat() {
             {t("companion.send")} <span className="arrow">↗</span>
           </button>
         </form>
-        <p className="hint c-disclaimer">{t("companion.notDiagnosis")}</p>
+        <p className="c-hint c-disclaimer">{t("companion.notDiagnosis")}</p>
         {entries.length > 0 && <button className="text-link" onClick={forget}>{t("companion.forget")}</button>}
       </div>
     </div>
