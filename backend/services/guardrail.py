@@ -11,7 +11,7 @@ _TEMPLATES = config.load_json(config.KB_DIR / "safe_templates.json")
 
 # Required disclaimers ("not a diagnosis") would otherwise trip the diagnostic pattern, so they are removed before scanning.
 _ALLOWED = re.compile(
-    r"(is )?not a diagnos\w*|no diagnos\w*|never diagnos\w*|does ?n[o']?t diagnos\w*|"
+    r"(is )?not a diagnos\w*|no diagnos\w*|never diagnos\w*|does ?n[o']?t diagnos\w*|(can[’']?t|can ?not|won[’']?t|unable to) (give (you )?a |make a )?diagnos\w*|"
     r"doctor (can|will|may) (make a |give a )?diagnos\w*|diagnosis is made by a doctor|"
     r"(यह )?(कोई )?निदान नहीं",
     re.I,
@@ -39,6 +39,12 @@ BANNED: dict[str, list[re.Pattern]] = {
         re.compile(r"\bbmi\b", re.I),
     ],
 }
+# Companion replies are free text, so home remedies and over-the-counter names are blocked there as well.
+REMEDIES = re.compile(
+    r"\b(herbal|ayurved\w*|homeopath\w*|kadha|chamomile|ajwain|turmeric|haldi|fenugreek|methi|cinnamon|ginger tea|"
+    r"supplements?|vitamins?|iron (tablets?|pills?)|painkillers?|paracetamol|ibuprofen|mefenamic|meftal|aspirin|dolo|crocin|combiflam)\b",
+    re.I,
+)
 _ADOLESCENT = re.compile(r"ultra\s?sound|sonograph|\bamh\b|अल्ट्रासाउंड|एएमएच", re.I)
 
 
@@ -59,17 +65,24 @@ def _strings(result: ResultCard) -> list[str]:
     return out
 
 
-def regex_check(result: ResultCard) -> GuardrailVerdict:
+def text_violations(texts: list[str], adolescent: bool = False, remedies: bool = False) -> list[str]:
     reasons = []
-    for s in _strings(result):
+    for s in texts:
         clean = _ALLOWED.sub(" ", s)
+        if remedies and (m := REMEDIES.search(clean)):
+            reasons.append(f"remedy: '{m.group(0)}'")
         for cat, pats in BANNED.items():
             for p in pats:
                 m = p.search(clean)
                 if m:
                     reasons.append(f"{cat}: '{m.group(0)}'")
-        if result.adolescent and _ADOLESCENT.search(clean):
+        if adolescent and _ADOLESCENT.search(clean):
             reasons.append("adolescent: ultrasound/AMH mentioned")
+    return sorted(set(reasons))
+
+
+def regex_check(result: ResultCard) -> GuardrailVerdict:
+    reasons = text_violations(_strings(result), result.adolescent)
     if not result.seek_urgent_care_if:
         reasons.append("missing: seek_urgent_care_if")
     return GuardrailVerdict(passed=not reasons, reasons=sorted(set(reasons)))

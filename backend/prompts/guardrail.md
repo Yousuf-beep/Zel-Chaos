@@ -10,7 +10,7 @@ Return pass=false, with a short reason for each problem, if the draft contains a
 6. If adolescent=true: any mention of ultrasound or AMH.
 
 Otherwise return pass=true with an empty reasons list.
-Call the record_guardrail tool. Output nothing else.
+Reply with the JSON object only (fields: passed, reasons). Output nothing else.
 
 KNOWLEDGE BASE:
 {PCOS_KB}

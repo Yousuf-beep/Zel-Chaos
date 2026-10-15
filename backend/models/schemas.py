@@ -158,3 +158,12 @@ class SignupRequest(BaseModel):
 class LoginRequest(BaseModel):
     handle: str = Field(max_length=120)
     password: str = Field(max_length=200)
+
+
+class CompanionRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
+    lang: str = "en-IN"
+
+
+class PeriodStartRequest(BaseModel):
+    start_date: str  # ISO date, YYYY-MM-DD

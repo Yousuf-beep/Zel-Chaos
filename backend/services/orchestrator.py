@@ -4,9 +4,10 @@ import time
 from typing import Any
 
 import config
-from adapters.llm import LLM, get_llm, today
+from adapters.llm import LLM, MockLLM, get_llm, today
 from models.schemas import DoctorCard, ExtractionResult, FlowResponse, Symptom, max_urgency
 from services import followups, guardrail, rules
+from services.language import detector
 from services.session import Session, store
 
 log = logging.getLogger("sakhi.flow")
@@ -29,7 +30,9 @@ class Orchestrator:
 
     async def analyze(self, sid: str, text: str, lang: str) -> FlowResponse:
         s = store.get_or_create(sid)
-        s.lang = lang
+        # Reply in the language and script she actually used (Hinglish in, Hinglish out), not just the UI language.
+        s.lang = (await detector.detect(text, lang, previous=s.lang if s.turns else None)).code
+        lang = s.lang
         s.turns.append(text.strip())
         s.result = None
 
@@ -38,7 +41,12 @@ class Orchestrator:
             return FlowResponse(type="urgent", payload=rules.urgent_payload(pre, lang))
 
         t0 = time.perf_counter()
-        s.base_extraction = await self.llm.extract(s.transcript, lang)
+        try:
+            s.base_extraction = await self.llm.extract(s.transcript, lang)
+        except Exception as e:
+            # The glossary matcher is deterministic and always available, so a model outage still yields chips.
+            log.warning("extract failed, using glossary matcher: %s %s", type(e).__name__, str(e)[:200])
+            s.base_extraction = await MockLLM().extract(s.transcript, lang)
         log.info("stage extract %.0f ms", (time.perf_counter() - t0) * 1000)
         if s.confirmed_chips is not None:
             # New text after confirmation: keep confirmed chips and add anything newly understood.
@@ -82,7 +90,11 @@ class Orchestrator:
         baseline, must_include = rules.urgency_baseline(ex, flags)
         adolescent = rules.is_adolescent(ex)
         t0 = time.perf_counter()
-        result = await self.llm.explain(ex, s.lang, baseline, adolescent, must_include)
+        try:
+            result = await self.llm.explain(ex, s.lang, baseline, adolescent, must_include)
+        except Exception as e:
+            log.warning("explain failed, using safe template: %s %s", type(e).__name__, str(e)[:200])
+            result = guardrail.safe_template(baseline, s.lang, adolescent)
         log.info("stage explain %.0f ms", (time.perf_counter() - t0) * 1000)
 
         result = self._enforce(result, ex, flags, baseline, s.lang)
@@ -113,7 +125,11 @@ class Orchestrator:
     async def doctor_card(self, sid: str) -> DoctorCard:
         s = self._require(sid)
         ex = self._current(s)
-        body, localised = await self.llm.doctor_card(ex, s.transcript, s.lang)
+        try:
+            body, localised = await self.llm.doctor_card(ex, s.transcript, s.lang)
+        except Exception as e:
+            log.warning("doctor card failed, using structured fallback: %s %s", type(e).__name__, str(e)[:200])
+            body, localised = await MockLLM().doctor_card(ex, s.transcript, s.lang)
         card = DoctorCard(**body.model_dump(), generated_on=today(), age=ex.age,
                           years_since_menarche=ex.years_since_menarche, language=s.lang,
                           localised=localised if s.lang != "en-IN" else None)

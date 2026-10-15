@@ -10,7 +10,7 @@ Rules:
 - Add any red flag you notice to red_flags using these IDs only: {RED_FLAG_IDS}. When in doubt, include it.
 - Set eating_concern=true if she mentions starving, vomiting after eating, or extreme food restriction.
 - pcos_pattern_signals reflect reported symptoms only. Never conclude a condition.
-- Call the record_extraction tool. Output nothing else.
+- Reply with the JSON object only. Output nothing else.
 
 GLOSSARY:
 {GLOSSARY_JSON}

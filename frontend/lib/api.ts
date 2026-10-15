@@ -65,6 +65,49 @@ export type DoctorCard = CardBody & {
   qr_text: string;
 };
 
+export type CycleStatus = {
+  last_period_start: string;
+  period_starts: string[];
+  cycle_length_setting: number;
+  period_length: number;
+  average_cycle_length: number;
+  cycle_day: number;
+  phase: "period" | "follicular" | "fertile_window" | "luteal" | "late";
+  on_period: boolean;
+  next_period_expected: string;
+  days_until_next: number;
+  days_late: number;
+  cycles_logged: number;
+  variation_days: number | null;
+  notes: string[];
+};
+export type CycleSetup = { last_period_start: string; cycle_length: number; period_length: number };
+
+export type CompanionAlert = {
+  level: "none" | "soon" | "now" | "emergency" | "crisis";
+  message: string;
+  numbers: { label: string; number: string }[];
+};
+export type CompanionReply = {
+  reply: string;
+  suggestions: string[];
+  question: string;
+  sentiment: string;
+  distress: number;
+  alert: CompanionAlert;
+  cycle: CycleStatus | null;
+  safe_fallback: boolean;
+};
+export type CompanionMessage = {
+  role: "user" | "assistant";
+  text: string;
+  at: number;
+  reply?: string;
+  suggestions?: string[];
+  question?: string;
+  alert?: CompanionAlert["level"];
+};
+
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -115,5 +158,11 @@ export const api = {
   answer: (session_id: string, question_key: string, answer: unknown) => req<Flow>("/api/answer", json({ session_id, question_key, answer })),
   tts: (text: string, lang: string) => req<{ audio_base64: string; parts: string[]; mime: string }>("/api/tts", json({ text, lang })),
   doctorCard: (session_id: string) => req<DoctorCard>("/api/doctor-card", json({ session_id })),
+  cycle: () => req<{ cycle: CycleStatus | null }>("/api/cycle", withCreds()),
+  setupCycle: (s: CycleSetup) => req<{ cycle: CycleStatus }>("/api/cycle", withCreds({ ...json(s), method: "PUT" })),
+  logPeriod: (start_date: string) => req<{ cycle: CycleStatus }>("/api/cycle/period", withCreds(json({ start_date }))),
+  companionChat: (text: string, lang: string) => req<CompanionReply>("/api/companion/chat", withCreds(json({ text, lang }))),
+  companionHistory: () => req<{ messages: CompanionMessage[] }>("/api/companion/history", withCreds()),
+  companionForget: () => req<{ ok: boolean }>("/api/companion/history", withCreds({ method: "DELETE" })),
   myths: (lang: string) => req<{ myths: { id: string; myth: string; fact: string }[] }>(`/api/myths?lang=${encodeURIComponent(lang)}`),
 };

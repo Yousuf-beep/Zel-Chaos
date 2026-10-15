@@ -189,15 +189,11 @@ class MockLLM:
         return body, body.model_copy()
 
 
-class ClaudeAdapter:
-    """Phase 2. Uses the official anthropic SDK with forced tool_choice and cache_control on system + KB."""
-
-    def __init__(self):
-        raise NotImplementedError("ClaudeAdapter is implemented in Phase 2. Run with MOCK_MODE=true for now.")
-
-
 def get_llm() -> LLM:
-    return MockLLM() if config.MOCK_LLM else ClaudeAdapter()
+    if config.MOCK_LLM:
+        return MockLLM()
+    from adapters.groq import GroqAdapter
+    return GroqAdapter()
 
 
 def today() -> str:
