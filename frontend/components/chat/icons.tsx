@@ -3,6 +3,7 @@ type P = { className?: string };
 const base = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
 
 export const IconMenu = (p: P) => <svg {...base} {...p}><path d="M4 8h16M4 16h10" /></svg>;
+export const IconHome = (p: P) => <svg {...base} {...p}><path d="M4 10.5L12 4l8 6.5V18.5a1.5 1.5 0 0 1-1.5 1.5H15v-5.5h-6V20H5.5A1.5 1.5 0 0 1 4 18.5z" /></svg>;
 export const IconNew = (p: P) => (
   <svg {...base} {...p}><path d="M12 4H6.5A2.5 2.5 0 0 0 4 6.5v11A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V12" /><path d="M17.6 3.6a1.9 1.9 0 0 1 2.8 2.8L13 13.8l-3.5.7.7-3.5z" /></svg>
 );

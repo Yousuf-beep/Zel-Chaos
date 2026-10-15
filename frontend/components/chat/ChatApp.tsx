@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -14,7 +15,7 @@ import CycleSheet from "./CycleSheet";
 import Message, { toEntry, type Entry } from "./Message";
 import ReportSheet from "./ReportSheet";
 import VoiceMode from "./VoiceMode";
-import { IconEdit, IconMenu, IconMore, IconNew, IconReport, IconTrash } from "./icons";
+import { IconEdit, IconHome, IconMenu, IconMore, IconNew, IconReport, IconTrash } from "./icons";
 
 const greetingKey = () => {
   const h = new Date().getHours();
@@ -190,9 +191,14 @@ export default function ChatApp() {
   return createPortal(
     <div className="chat-app">
       <header className="chat-top">
-        <button type="button" className="c2-icon" data-sfx="slide" onClick={openDrawer} aria-label={t("chatui.openChats")} aria-expanded={drawer}>
-          <IconMenu />
-        </button>
+        <div className="chat-top-actions">
+          <button type="button" className="c2-icon" data-sfx="slide" onClick={openDrawer} aria-label={t("chatui.openChats")} aria-expanded={drawer}>
+            <IconMenu />
+          </button>
+          <Link href="/home" className="c2-icon" aria-label={t("chatui.home")} title={t("chatui.home")}>
+            <IconHome />
+          </Link>
+        </div>
         <h1 className="chat-title">{active?.title || (activeId ? "" : "Nola")}</h1>
         <div className="chat-top-actions">
           {activeId && (
