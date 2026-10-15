@@ -1,33 +1,33 @@
-# Sakhi
+# Nola
 
-**A friend who listens, in your own language.** Sakhi is a voice- and chat-first companion for menstrual and emotional wellbeing, built for women in India. She can talk or type in English, Hindi, Kannada, Tamil, or a mix like Hinglish, and Sakhi answers in the same style.
+**A friend who listens, in your own language.** Nola is a voice- and chat-first companion for menstrual and emotional wellbeing, built for women in India. She can talk or type in English, Hindi, Kannada, Tamil, or a mix like Hinglish, and Nola answers in the same style.
 
-Sakhi listens, reassures and suggests everyday self-care. **It never diagnoses and never prescribes.** When something sounds serious, it tells her clearly to see a doctor, with emergency numbers one tap away.
+Nola listens, reassures and suggests everyday self-care. **It never diagnoses and never prescribes.** When something sounds serious, it tells her clearly to see a doctor, with emergency numbers one tap away.
 
 <table>
   <tr>
-    <td align="center"><img src="docs/screenshots/01-welcome.png" width="220" alt="Welcome screen"/><br/><sub>Welcome</sub></td>
-    <td align="center"><img src="docs/screenshots/02-home.png" width="220" alt="Home screen with call and chat"/><br/><sub>Home: call or chat</sub></td>
-    <td align="center"><img src="docs/screenshots/03-cycle-setup.png" width="220" alt="Cycle setup form"/><br/><sub>Cycle setup</sub></td>
+    <td align="center"><img src="docs/screenshots/01-signup.png" width="220" alt="Email sign-up"/><br/><sub>Email sign-up</sub></td>
+    <td align="center"><img src="docs/screenshots/02-onboarding.png" width="220" alt="One-time questions after sign-up"/><br/><sub>One-time questions</sub></td>
+    <td align="center"><img src="docs/screenshots/03-home.png" width="220" alt="Home with Nola"/><br/><sub>Home: call or chat</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/05-companion-hinglish.png" width="220" alt="Companion replying in Hinglish"/><br/><sub>Hinglish in, Hinglish out</sub></td>
-    <td align="center"><img src="docs/screenshots/06-no-diagnosis.png" width="220" alt="Companion declining to diagnose"/><br/><sub>No diagnosis, no tablets</sub></td>
-    <td align="center"><img src="docs/screenshots/07-emergency-alert.png" width="220" alt="Emergency alert with call buttons"/><br/><sub>Red flags: get help now</sub></td>
+    <td align="center"><img src="docs/screenshots/04-chat-empty.png" width="220" alt="New chat with Nola"/><br/><sub>New chat</sub></td>
+    <td align="center"><img src="docs/screenshots/05-chat-thread.png" width="220" alt="Chat thread with suggestions"/><br/><sub>Listens, suggests, never diagnoses</sub></td>
+    <td align="center"><img src="docs/screenshots/06-drawer.png" width="220" alt="Chats drawer"/><br/><sub>Saved chats</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/04-chat-start.png" width="220" alt="Cycle tracker and empty chat"/><br/><sub>Cycle tracker</sub></td>
-    <td align="center"><img src="docs/screenshots/08-call.png" width="220" alt="Voice call screen"/><br/><sub>Voice call</sub></td>
-    <td align="center"><img src="docs/screenshots/09-learn.png" width="220" alt="Learn page about PCOS renamed PMOS"/><br/><sub>Learn: PCOS is now PMOS</sub></td>
+    <td align="center"><img src="docs/screenshots/07-voice.png" width="220" alt="Voice mode"/><br/><sub>Voice mode</sub></td>
+    <td align="center"><img src="docs/screenshots/08-report-sheet.png" width="220" alt="Doctor-visit report preview"/><br/><sub>Doctor-visit report</sub></td>
+    <td align="center"><img src="docs/screenshots/09-report-pdf.png" width="220" alt="First page of the report PDF"/><br/><sub>Report PDF</sub></td>
   </tr>
 </table>
 
-> Sakhi gives health information and care navigation, not medical advice. In an emergency in India, call **112**. For mental-health support, call **Tele-MANAS 14416** (free, 24x7).
+> Nola gives health information and care navigation, not medical advice. In an emergency in India, call **112**. For mental-health support, call **Tele-MANAS 14416** (free, 24x7).
 
 ## Contents
 
 - [What it does](#what-it-does)
-- [How Sakhi stays safe](#how-sakhi-stays-safe)
+- [How Nola stays safe](#how-nola-stays-safe)
 - [Architecture](#architecture)
 - [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
@@ -42,16 +42,20 @@ Sakhi listens, reassures and suggests everyday self-care. **It never diagnoses a
 
 | Feature | What she sees | Where it lives |
 | --- | --- | --- |
-| **Companion chat** (`/chat`) | A warm reply that names how she feels, reassurance, 0 to 3 self-care suggestions (sleep, balanced meals, stress, emotional wellbeing) and one gentle follow-up question | `backend/services/companion.py`, `frontend/components/CompanionChat.tsx` |
+| **Chat with Nola** (`/chat`) | A phone-app chat: a drawer of saved chats (search, rename, delete, clear all), a warm reply that names how she feels, 0 to 3 self-care suggestions and one gentle follow-up question, copy and read-aloud on every reply | `backend/services/companion.py`, `frontend/components/chat/` |
+| **Voice mode** | Full-screen, hands-free conversation: Nola listens, replies out loud and listens again; every turn lands in the same chat | `frontend/components/chat/VoiceMode.tsx` |
+| **Doctor-visit report** | After a chat, a branded PDF: what she reported, her own words, when Nola suggested a doctor, the everyday suggestions given, questions to ask, and the full transcript, under a clear "not a diagnosis" notice | `backend/services/report.py`, `backend/services/report_pdf.py` |
+| **One-time questions** (`/welcome`) | Right after sign-up, never again: age, how regular her periods are (plus dates), what she wants help with, what a doctor already told her, hormonal medicines. All skippable | `backend/services/profile.py`, `frontend/app/welcome` |
 | **Cycle tracking** | Day of cycle, phase, next expected period, how late it is, a "My period started" button; averages improve with each logged period | `backend/services/cycle.py` |
-| **Memory** | Sakhi remembers earlier conversations ("last time you mentioned trouble sleeping") through stored history, keyword recall and rolling notes | `backend/services/memory.py` |
-| **Voice call** (`/call`) | Speak in any language; Sarvam transcribes, Sakhi asks a few follow-up questions, then shows a result card and reads it aloud | `backend/services/orchestrator.py`, `frontend/components/TalkFlow.tsx` |
+| **Memory** | Nola remembers earlier chats ("last time you mentioned trouble sleeping") through stored history, keyword recall and rolling notes | `backend/services/memory.py` |
+| **Symptom check** (`/call`) | Speak in any language; Sarvam transcribes, Nola asks a few follow-up questions, then shows a result card and reads it aloud | `backend/services/orchestrator.py`, `frontend/components/TalkFlow.tsx` |
+| **Sounds** | Optional UI sounds (off by default), after the ZEL site; CC0 effects by Kenney | `frontend/lib/sound.ts`, `frontend/public/sfx/` |
 | **Doctor card** | A one-page, patient-reported summary (symptom timeline, her own words, cycle notes) with a QR code to show a doctor; never an interpretation | `backend/prompts/doctor_card.md`, `frontend/app/doctor-card` |
 | **Learn** | The PCOS to PMOS rename and myth-versus-fact cards, with audio | `backend/kb/myths.json`, `frontend/app/learn` |
 | **Quick exit** | One tap clears the session, logs out and jumps to a neutral page, for privacy on shared phones | `frontend/components/QuickExit.tsx` |
-| **Delete my history** | Removes all chats, Sakhi's notes and the cycle log | `DELETE /api/companion/history` |
+| **Delete my data** | "Clear all chats" removes chats and Nola's notes; "Delete all my data" also removes the cycle log and sign-up answers | `DELETE /api/conversations`, `DELETE /api/account/data` |
 
-## How Sakhi stays safe
+## How Nola stays safe
 
 Deterministic rules run before and after every model call, and the rules always win.
 
@@ -59,7 +63,7 @@ Deterministic rules run before and after every model call, and the rules always 
 2. **The model can raise urgency, never lower it.** The companion returns `see_doctor: no | soon | now` and a distress score from 0 to 3. The app takes the higher of the rules and the model.
 3. **Output guardrail.** Every reply is checked against patterns for diagnostic language ("you have PCOS", "diagnosed", including Hinglish forms such as "aapko ... hai"), medicine names, doses, home and herbal remedies, and weight or calorie numbers (`backend/services/guardrail.py`). A failed reply is regenerated once with the reasons; a second failure falls back to a fixed, safe, supportive message.
 4. **Prompt rules.** The prompts in `backend/prompts/` forbid diagnosing, naming likely conditions, suggesting self-medication, assuming marital status, or giving diet plans. They also switch off weight and food advice when she mentions an eating concern.
-5. **Teen-aware.** Under 18, or fewer than 8 years since her first period, Sakhi never mentions ultrasound or AMH and suggests involving a trusted adult.
+5. **Teen-aware.** Under 18, or fewer than 8 years since her first period, Nola never mentions ultrasound or AMH and suggests involving a trusted adult.
 
 ## Architecture
 
@@ -69,11 +73,13 @@ flowchart LR
   N --> B["FastAPI backend"]
   B -->|"chat, extraction, result card"| G["Groq Cloud<br/>openai/gpt-oss-120b"]
   B -->|"speech-to-text, text-to-speech,<br/>language ID, transliteration"| S["Sarvam AI"]
-  B -->|"asyncpg pool"| P[("Supabase Postgres<br/>schema: sakhi")]
+  B -->|"asyncpg pool"| P[("Supabase Postgres<br/>schema: nola")]
 ```
 
 - The browser only talks to `/api` on its own origin. Next.js forwards those calls to FastAPI, so one HTTPS tunnel is enough for microphone access on a phone.
-- Only the backend touches the database. The `sakhi` schema is not exposed through Supabase's Data API and has RLS on every table, so the publishable key cannot read anything.
+- Only the backend touches the database. The `nola` schema is not exposed through Supabase's Data API and has RLS on every table, so the publishable key cannot read anything.
+- Chat text, chat titles, Nola's notes, reports and sign-up answers are encrypted with AES-256-GCM (`backend/services/crypto.py`) before they reach the database. The backend will not start against Postgres without `DATA_ENCRYPTION_KEY`.
+- Login is an httpOnly, SameSite cookie holding a random token (only its SHA-256 is stored). Sessions slide forward while in use, and repeated wrong passwords are throttled.
 - Every external service has a mock (`MOCK_MODE=true`), so the full flow runs offline without keys. That is how the tests run.
 
 ## Tech stack
@@ -106,13 +112,19 @@ Fill in the keys you have. With `MOCK_MODE=true` and no keys, everything runs on
 
 ### 2. Database (Supabase)
 
-Apply the schema once, in the Supabase SQL editor or with the Supabase CLI:
+Apply the migrations in order, with the Supabase CLI or the bundled script:
 
 ```bash
-supabase db push   # or paste supabase/migrations/20261015000000_sakhi_schema.sql into the SQL editor
+supabase db push
+# or, from backend/ with DATABASE_URL set, one file at a time:
+python scripts/apply_migration.py ../supabase/migrations/20261015000000_sakhi_schema.sql
+python scripts/apply_migration.py ../supabase/migrations/20261016000000_conversations_profiles_reports.sql
+python scripts/apply_migration.py ../supabase/migrations/20261016100000_rename_schema_to_nola.sql
 ```
 
-Then set `DATABASE_URL` in `.env`. If you have data in an old local SQLite file, copy it across (safe to re-run):
+The project was first called Sakhi, so the first two migrations create a `sakhi` schema and the third renames it to `nola`.
+
+Then set `DATABASE_URL` and `DATA_ENCRYPTION_KEY` in `.env`. Chats saved before encryption existed can be sealed in place with `python scripts/encrypt_existing.py`. If you have data in an old local SQLite file, copy it across (safe to re-run):
 
 ```bash
 cd backend
@@ -120,7 +132,7 @@ python scripts/migrate_sqlite_to_supabase.py --dry-run
 python scripts/migrate_sqlite_to_supabase.py
 ```
 
-Leave `DATABASE_URL` empty to use local SQLite at `backend/data/sakhi.db` instead.
+Leave `DATABASE_URL` empty to use local SQLite at `backend/data/nola.db` instead.
 
 ### 3. Backend
 
@@ -142,7 +154,7 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>, sign up, and pick **Start chat** or **Start call**.
+Open <http://localhost:3000>, sign up with an email, answer the one-time questions (or skip them), and pick **Start chat** or **Start call**.
 
 To try it on a phone, expose port 3000 over HTTPS (for example `cloudflared tunnel --url http://localhost:3000`). Browsers only allow the microphone on HTTPS.
 
@@ -160,8 +172,9 @@ All settings live in the repo-root `.env`; see `.env.example`.
 | `SARVAM_STT_MODEL` / `SARVAM_TTS_MODEL` | Sarvam models | `saaras:v3` / `bulbul:v3` |
 | `DATABASE_URL` | Supabase Postgres connection string (backend only); empty means local SQLite | empty |
 | `DB_POOL_MAX` | Max pooled DB connections per backend process | `10` |
+| `DATA_ENCRYPTION_KEY` | AES-256-GCM key (urlsafe base64 of 32 bytes) for chats, notes, reports and sign-up answers. Required with `DATABASE_URL`; back it up, as losing it makes saved chats unreadable | empty |
 | `HISTORY_TTL_DAYS` | Chat messages older than this are deleted | `90` |
-| `AUTH_TTL_DAYS` | Login session length | `30` |
+| `AUTH_TTL_DAYS` | Login session length; renewed while she keeps using the app | `30` |
 | `MAX_FOLLOWUPS` | Follow-up questions in the call flow | `4` |
 | `SESSION_TTL_MIN` | Call-flow session lifetime (in memory) | `30` |
 | `ALLOWED_ORIGINS` | CORS origins for the backend | `http://localhost:3000` |
@@ -184,24 +197,30 @@ All settings live in the repo-root `.env`; see `.env.example`.
 │   ├── services/
 │   │   ├── companion.py        sentiment-first companion chat
 │   │   ├── cycle.py            cycle maths + cycle store
-│   │   ├── memory.py           chat history, recall, rolling notes
+│   │   ├── memory.py           chats (conversations), recall, rolling notes
+│   │   ├── profile.py          one-time sign-up questions
+│   │   ├── report.py           doctor-visit report (model summary + guardrail)
+│   │   ├── report_pdf.py       branded PDF with Indic text shaping (fpdf2 + HarfBuzz)
+│   │   ├── crypto.py           AES-GCM encryption of health data at rest
 │   │   ├── language.py         language + script detection (Hinglish)
 │   │   ├── orchestrator.py     call flow: extract, follow-ups, result card
 │   │   ├── followups.py        which question to ask next
 │   │   ├── rules.py            red flags, urgency, teen filters
 │   │   ├── guardrail.py        output checks, safe templates
-│   │   ├── auth.py             accounts and login tokens (scrypt)
+│   │   ├── auth.py             email accounts, login tokens (scrypt), throttling
 │   │   ├── db.py               asyncpg pool / SQLite fallback
 │   │   └── session.py, audio.py, textnorm.py
-│   ├── prompts/                system prompts (companion, extract, explain, guardrail, doctor card)
+│   ├── prompts/                system prompts (companion, notes, report, extract, explain, guardrail, doctor card)
+│   ├── assets/                 report fonts (Inter Tight, Noto Sans Indic; OFL) and the Nola mascot
 │   ├── kb/                     curated knowledge base, red flags, glossary, myths, care resources
 │   ├── eval/                   evaluation cases and scripts
-│   ├── scripts/                one-off tools (SQLite to Supabase copy)
+│   ├── scripts/                apply a migration, seal old chats, SQLite to Supabase copy
 │   └── tests/                  pytest suite (runs fully offline)
 ├── frontend/
-│   ├── app/                    pages: /, /home, /chat, /call, /result, /urgent, /doctor-card, /learn, /about
-│   ├── components/             CompanionChat, TalkFlow, MicButton, ResultCards, AudioPlayer, ...
-│   ├── lib/                    API client, store, i18n
+│   ├── app/                    pages: /, /welcome, /home, /chat, /call, /result, /urgent, /doctor-card, /learn, /about
+│   ├── components/chat/        chat app: drawer, messages, composer, voice mode, report and cycle sheets
+│   ├── components/             Mascot, SoundToggle, TalkFlow, MicButton, ResultCards, AudioPlayer, ...
+│   ├── lib/                    API client, store, i18n, sound, speech
 │   └── locales/                UI copy: en, hi, kn, ta
 ├── supabase/migrations/        Postgres schema
 └── docs/screenshots/           images used in this README
@@ -209,16 +228,21 @@ All settings live in the repo-root `.env`; see `.env.example`.
 
 ## API
 
-Routes under `/api/companion` and `/api/cycle` need the `sakhi_auth` login cookie.
+Routes under `/api/companion`, `/api/conversations`, `/api/profile`, `/api/cycle` and `/api/account` need the `nola_auth` login cookie.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `GET` | `/api/health` | Service status, mocks, database, models |
 | `GET` | `/api/languages` | Supported languages |
-| `POST` | `/api/auth/signup` · `/login` · `/logout` | Accounts (email or 10-digit phone) |
-| `GET` | `/api/auth/me` | Current user |
-| `POST` | `/api/companion/chat` | Send a message; returns reply, suggestions, question, sentiment, alert, cycle, detected reply language |
-| `GET` / `DELETE` | `/api/companion/history` | Read recent history / delete all history, notes and cycle data |
+| `POST` | `/api/auth/signup` · `/login` · `/logout` | Accounts (sign-up by email; older phone accounts can still log in) |
+| `GET` | `/api/auth/me` | Current user, whether onboarding is done; renews the session |
+| `GET` / `PUT` | `/api/profile` | One-time sign-up answers (and optional cycle setup) |
+| `POST` | `/api/companion/chat` | Send a message (with `conversation_id`, or none to start a chat); returns reply, suggestions, question, alert, cycle, reply language, chat id and title |
+| `GET` / `DELETE` | `/api/conversations` | List chats / clear every chat and Nola's notes |
+| `GET` / `PATCH` / `DELETE` | `/api/conversations/{id}` | Read a chat's messages / rename / delete |
+| `POST` | `/api/conversations/{id}/report` | Doctor-visit report as JSON (cached until the chat changes) |
+| `GET` | `/api/conversations/{id}/report.pdf` | The same report as a branded PDF |
+| `DELETE` | `/api/account/data` | Delete every chat, notes, cycle log and sign-up answers |
 | `GET` / `PUT` | `/api/cycle` | Read status / set up cycle (last start, cycle and period length) |
 | `POST` | `/api/cycle/period` | Log a period start |
 | `DELETE` | `/api/cycle/period/{date}` | Remove a logged start |
@@ -233,7 +257,7 @@ Routes under `/api/companion` and `/api/cycle` need the `sakhi_auth` login cooki
 
 ```bash
 cd backend
-python -m pytest -q             # 65 tests, offline: mocks + SQLite
+python -m pytest -q             # 78 tests, offline: mocks + SQLite
 python eval/run_eval.py         # runs eval/cases.csv through the orchestrator, writes eval/results.md
 python eval/validate_rules.py   # checks the PCOS-pattern rules against a labelled dataset, writes eval/dataset_results.md
 
@@ -247,7 +271,7 @@ npm run typecheck
 
 The UI ships in English, Hindi, Kannada and Tamil; other languages fall back to English UI. Replies follow how she writes, not the UI setting:
 
-| She writes | Sakhi replies in |
+| She writes | Nola replies in |
 | --- | --- |
 | English | English |
 | Hindi in Devanagari, or Kannada, Tamil, Telugu and other Indian scripts | The same language and script |
@@ -265,4 +289,4 @@ Detection uses the script of the text first, then Sarvam's language identificati
 
 ## Disclaimer
 
-Sakhi is a health-information and support tool. It does not diagnose, treat or prescribe, and it is not a substitute for a doctor. The knowledge base (`backend/kb/pcos_kb.md`) is based on the 2023 International Evidence-based Guideline for PCOS and the 2026 PMOS renaming consensus; clinical review is still pending.
+Nola is a health-information and support tool. It does not diagnose, treat or prescribe, and it is not a substitute for a doctor. The knowledge base (`backend/kb/pcos_kb.md`) is based on the 2023 International Evidence-based Guideline for PCOS and the 2026 PMOS renaming consensus; clinical review is still pending.
